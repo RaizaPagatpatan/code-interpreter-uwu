@@ -1,5 +1,5 @@
-//import com.hgroupeight.interpreter.ast.ProgramNode;
-//import com.hgroupeight.interpreter.interpreter.Interpreter;
+import com.hgroupeight.interpreter.ast.ProgramNode;
+import com.hgroupeight.interpreter.interpreter.Interpreter;
 
 import com.hgroupeight.interpreter.ast.ProgramNode;
 import com.hgroupeight.interpreter.interpreter.Interpreter;
@@ -24,20 +24,20 @@ public class Main {
         String code =
                 """
                 BEGIN CODE
-                
+
                 #casoplkdasj
-               
-            
-                FLOAT a, b;
-                a = 2.3423;
+
+                INT a;
+                a = 2;
                 #comment only
-                DISPLAY a;
-                DISPLAY b;
-       
-                
-                
+                DISPLAY: a;
+                DISPLAY: "ASDASD";
+                CHAR b;
+                b = 'b';
+                DISPLAY: b & a;
                 END CODE
                 """;
+
 
 
         // sample code to plug in for test huhu
@@ -71,6 +71,8 @@ public class Main {
     }
 }
 //SCANNER TYPE NGA READER/INTERPRETER PLSPLSPLS DONT REMOVE OR MODIFY
+
+//import com.hgroupeight.interpreter.lexer.Lexer;
 //
 //import java.util.Scanner;
 //

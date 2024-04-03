@@ -11,6 +11,7 @@ import java.util.List;
 
 public class Parser {
     private final Lexer lexer;
+    private int currentLine = 1;
 
     public Parser(Lexer lexer) {
         this.lexer = lexer;
@@ -116,7 +117,9 @@ public class Parser {
     }
 
     private DisplayNode parseDisplayStatement() throws ParseException {
+        int displayLine = currentLine; // for catching line errors only
         lexer.consume(Token.Type.DISPLAY, "DISPLAY");
+//        lexer.consume(Token.Type.COLON, ":");
         List<ExpressionNode> expressions = new ArrayList<>();
 
         ExpressionNode expression = parseExpression();
@@ -134,7 +137,6 @@ public class Parser {
         lexer.consume(Token.Type.SEMICOLON, ";");
         return new DisplayNode(expressions);
     }
-
 
     private ExpressionNode parseExpression() throws ParseException {
         Token currentToken = lexer.peek();
