@@ -548,16 +548,17 @@ public class Lexer {
             }
             currentPos++;
         }
-        if (value.toString().equals("\"FALSE\"") ||  value.toString().equals("\"TRUE\"")) {
-            return  new Token(Token.Type.BOOLEAN_LITERAL, value.toString(), tokenStartPos);
-        }
         return new Token(Token.Type.STRING_LITERAL, value.toString(), tokenStartPos);
     }
 
     public void consume(Token.Type type, String value) throws ParseException {
         Token token = getNextToken();
-        if (token == null || token.getType() != type || !token.getValue().equals(value)) { // Check if token type and value match the expected ones
-            throw new ParseException("Expected token '" + value + "' but found '" + (token != null ? token.getValue() : "null") + "'", 0); // Assuming 0 as position
+        if (token == null ) { // Check if token type and value match the expected ones
+            throw new ParseException("1 Expected token '" + value + "' but found '" + (token != null ? token.getValue() : "null") + "'", 0); // Assuming 0 as position
+        }         else if (token.getType() != type ) { // Check if token type and value match the expected ones
+            throw new ParseException("2 Expected token '" + value + "' but found '" + (token != null ? token.getValue() : "null") + "'", 0); // Assuming 0 as position
+        }         else if (!token.getValue().equals(value)) { // Check if token type and value match the expected ones
+            throw new ParseException("3 Expected token '" + value + "' but found '" + (token != null ? token.getValue() : "null") + "'", 0); // Assuming 0 as position
         }
     }
 

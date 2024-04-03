@@ -59,7 +59,7 @@ public class Main {
         // parse program
         try {
             ProgramNode program = parser.parse();
-//            System.out.println("PROGRAM NODE\n" + program);
+            System.out.println("PROGRAM NODE" + program);
             // 4. AST
             interpreter.interpret(program, symbolTable);
 //            System.out.println("Symbol Table " + symbolTable);

@@ -92,7 +92,9 @@ public class BinaryExpressionNode extends ExpressionNode {
         GREATER_THAN(">"),
         GREATER_THAN_EQUAL(">="),
         LOGICAL_AND("AND"),
-        LOGICAL_OR("OR");
+        LOGICAL_OR("OR"),
+        CONCATENATE("&");
+
 
         private final String symbol;
 
@@ -114,6 +116,9 @@ public class BinaryExpressionNode extends ExpressionNode {
         Object leftValue = left.evaluate(symbolTable);
         Object rightValue = right.evaluate(symbolTable);
 
+        if (operator.equals(BinaryOperator.CONCATENATE)) {
+            return leftValue.toString() + rightValue.toString();
+        }
         if (leftValue instanceof Integer && rightValue instanceof Integer) {
             int leftInt = (Integer) leftValue;
             int rightInt = (Integer) rightValue;
