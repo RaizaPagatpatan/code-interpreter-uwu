@@ -27,18 +27,17 @@ public class Main {
                 
                 #casoplkdasj
                
-            
                 INT a;
                 a = 2;
+                INT b;
+                b = 3;
+                INT c;
+                c = 4;
                 #comment only
-                DISPLAY a;
-                DISPLAY "ASDASD";
-                
+                DISPLAY b & "HELLO" & c;
                 
                 END CODE
                 """;
-
-
 
         // sample code to plug in for test huhu
         //                INT x, y, z=5
@@ -48,7 +47,6 @@ public class Main {
         //                a_1=’c’
         //                # this is a comment
         //                DISPLAY: x & t & z & $ & a_1 & [#] & “last”
-
 
         // 2. lexer, parser, symbol table, and interpreter
         Lexer lexer = new Lexer(code);

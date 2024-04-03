@@ -42,11 +42,12 @@ public class Interpreter {
             if (expression.getExpressionType() == ExpressionNode.ExpressionType.IDENTIFIER)
             {
                 System.out.println("VALUE " + symbolTable.get(value.toString()));
+                value = symbolTable.get(value.toString());
             }
 //
             output.append(value);
         }
-        System.out.println("ASD" + output.toString());
+        System.out.println("ASD " + output.toString());
     }
 
     private void interpretAssignment(AssignmentNode assignmentNode, SymbolTable symbolTable) throws Exception {

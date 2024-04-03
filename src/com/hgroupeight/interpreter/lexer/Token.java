@@ -60,7 +60,6 @@ public class Token {
         OPERATOR,
         SEMICOLON,
         DOLLAR,
-        AMPERSAND,
         LEFT_BRACE,
         RIGHT_BRACE,
         PLUS,

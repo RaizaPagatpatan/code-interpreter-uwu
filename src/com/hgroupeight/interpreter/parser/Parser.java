@@ -79,7 +79,6 @@ public class Parser {
                 break;
         }
 
-
         do {
             Token identifier = lexer.getNextToken();
 
@@ -135,11 +134,18 @@ public class Parser {
         lexer.consume(Token.Type.DISPLAY, "DISPLAY");
         List<ExpressionNode> expressions = new ArrayList<>();
 
-        do {
-            ExpressionNode expression = parseExpression();
+        ExpressionNode expression = parseExpression();
+        expressions.add(expression);
+        System.out.println("Parsed expression: " + expression); // Print the first parsed expression
+
+        // Loop to handle concatenation
+        while (lexer.peek().getType() == Token.Type.CONCATENATE) {
+            lexer.consume(Token.Type.CONCATENATE, "&"); // Consume the CONCATENATE token
+            expression = parseExpression();
             expressions.add(expression);
+
             System.out.println("Parsed expression: " + expression); // Print each parsed expression
-        } while (lexer.peek().getType() == Token.Type.CONCATENATE);
+        }
 
         lexer.consume(Token.Type.SEMICOLON, ";");
         return new DisplayNode(expressions);
@@ -158,11 +164,41 @@ public class Parser {
                 return parseLiteralExpression();
             case KEYWORD:
                 return parseKeywordExpression();
+//            case CONCATENATE:
+//                return parseConcatExpression();
             default:
                 throw new ParseException("Unexpected token: " + currentToken.getValue(), lexer.peek().getPosition());
         }
     }
 
+//    private ExpressionNode parseConcatExpression() throws ParseException {
+//        List<ExpressionNode> expressions = new ArrayList<>();
+//        int count = 0;
+////        do {
+////            count++;
+////            expressions.add(parseExpression());
+////            if (lexer.peek().getType() == Token.Type.CONCATENATE) {
+////                lexer.getNextToken();
+////            } else {
+////                break;
+////            }
+////        } while (count <= 5);
+//
+//        return buildConcatenation(expressions);
+//    }
+//
+//    private ExpressionNode buildConcatenation(List<ExpressionNode> expressions) {
+//        // Assuming a simple left-associative concatenation
+//        if (expressions.size() == 1) {
+//            return expressions.get(0);
+//        } else {
+//            ExpressionNode result = expressions.get(0);
+//            for (int i = 1; i < expressions.size(); i++) {
+//                result = new BinaryExpressionNode(result, expressions.get(i), BinaryExpressionNode.BinaryOperator.CONCATENATE);
+//            }
+//            return result;
+//        }
+//    }
     private LiteralNode parseLiteralExpression() throws ParseException {
         Token token = lexer.getNextToken();
         ExpressionNode.ExpressionType expressionType;
@@ -184,8 +220,6 @@ public class Parser {
         }
         return new LiteralNode(expressionType, token.getValue());
     }
-
-
 
     private ExpressionNode parseKeywordExpression() throws ParseException {
         Token token = lexer.getNextToken();
