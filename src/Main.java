@@ -28,10 +28,11 @@ public class Main {
                 #casoplkdasj
                
             
-                Int a;
+                INT a;
                 a = 2;
                 #comment only
                 DISPLAY a;
+                DISPLAY "ASDASD";
                 
                 
                 END CODE

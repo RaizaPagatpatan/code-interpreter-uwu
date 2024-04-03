@@ -369,6 +369,8 @@ public class Lexer {
                     currentPos++;
                     return new Token(Token.Type.RIGHT_PAREN,")", currentPos);
                 case '=':
+
+                    System.out.println("CHAR AT " + code.charAt(currentPos));
                     currentPos++;
                     if (currentPos < code.length() && code.charAt(currentPos) == '=') {
                         currentPos++;
