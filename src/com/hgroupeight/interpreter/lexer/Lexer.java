@@ -329,7 +329,11 @@ public class Lexer {
 
         // Handle other token types
         // Identifiers and keywords
-        if (Character.isAlphabetic(ch) || ch == '_') {
+        // String literals
+        if (ch == '"') {
+            return handleStringLiteral();
+        }
+        else if (Character.isAlphabetic(ch) || ch == '_') {
             return handleIdentifierOrKeyword();
         }
         // Number literals
@@ -339,10 +343,6 @@ public class Lexer {
         // Character literals
         else if (ch == '\'') {
             return handleCharLiteral();
-        }
-        // String literals
-        else if (ch == '"') {
-            return handleStringLiteral();
         }
         else {
             // OPERATORS
@@ -402,7 +402,7 @@ public class Lexer {
                     }
                 case '&':
                     currentPos++;
-                    return new Token(Token.Type.AMPERSAND,"&", currentPos);
+                    return new Token(Token.Type.CONCATENATE,"&", currentPos);
                 case ',':
                     currentPos++;
                     return new Token(Token.Type.COMMA,",", currentPos);
@@ -431,7 +431,7 @@ public class Lexer {
             text.append(code.charAt(currentPos));
             currentPos++;
         }
-        String identifier = text.toString().toUpperCase(); // Convert to upper case for case-insensitive comparison
+        String identifier = text.toString(); // Convert to upper case for case-insensitive comparison
         Token.Type type;
 
         // Check if the identifier is "INT"

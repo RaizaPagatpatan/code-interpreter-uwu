@@ -27,7 +27,7 @@ public class Parser {
 //                VariableNode var = parseVariableDeclaration();
 //
 //                System.out.println("VAR " + var);
-                variableDeclarations.addAll(parseVariableDeclarations());
+                variableDeclarations.addAll(parseVariableDeclarations("INT"));
             } else {
                 statements.add(parseStatement());
             }
@@ -64,13 +64,24 @@ public class Parser {
     }
 
 
-    private List<VariableNode> parseVariableDeclarations() throws ParseException {
+    private List<VariableNode> parseVariableDeclarations(String type) throws ParseException {
         List<VariableNode> declarations = new ArrayList<>();
-        lexer.consume(Token.Type.INTEGER_LITERAL, "INT");
+        DataType dataType = null;
+
+        switch (type) {
+            case "INT":
+                lexer.consume(Token.Type.INTEGER_LITERAL, "INT");
+                dataType = DataType.INTEGER;
+                break;
+            case "CHAR":
+                lexer.consume(Token.Type.CHAR_LITERAL, "CHAR");
+                dataType = DataType.CHAR;
+                break;
+        }
+
 
         do {
             Token identifier = lexer.getNextToken();
-            DataType dataType = DataType.INTEGER;
 
             // Check if there's an assignment
             ExpressionNode expression = null;
@@ -113,8 +124,6 @@ public class Parser {
 
     private AssignmentNode parseAssignmentStatement() throws ParseException {
         Token identifier = lexer.getNextToken();
-        System.out.println("ASSIGNMENT IDENTIFIER " + identifier.getValue());
-        System.out.println("WHO IS 32 " + lexer.code.charAt(32));
 
         lexer.consume(Token.Type.ASSIGN, "=");
         ExpressionNode expression = parseExpression();
@@ -124,15 +133,13 @@ public class Parser {
 
     private DisplayNode parseDisplayStatement() throws ParseException {
         lexer.consume(Token.Type.DISPLAY, "DISPLAY");
-
         List<ExpressionNode> expressions = new ArrayList<>();
-//        Token identifier = lexer.getNextToken();
-//        System.out.println("IDENTIFIER DISPLAY " + identifier);
+
         do {
             ExpressionNode expression = parseExpression();
             expressions.add(expression);
             System.out.println("Parsed expression: " + expression); // Print each parsed expression
-        } while (lexer.peek().getType() == Token.Type.AMPERSAND);
+        } while (lexer.peek().getType() == Token.Type.CONCATENATE);
 
         lexer.consume(Token.Type.SEMICOLON, ";");
         return new DisplayNode(expressions);

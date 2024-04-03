@@ -35,19 +35,18 @@ public class Interpreter {
     private void interpretDisplay(DisplayNode displayNode, SymbolTable symbolTable) throws Exception {
         List<ExpressionNode> expressions = displayNode.getExpressions();
 
-//        for (ExpressionNode expression : expressions) {
-//            System.out.println("Expression: " + expression);
-//        }
-
-
         StringBuilder output = new StringBuilder();
         for (ExpressionNode expression : expressions) {
             System.out.println("EXPRESSION " + expression);
             Object value = expression.evaluate(symbolTable);
-            System.out.println("VALUE " + symbolTable.get(value.toString()));
+            if (expression.getExpressionType() == ExpressionNode.ExpressionType.IDENTIFIER)
+            {
+                System.out.println("VALUE " + symbolTable.get(value.toString()));
+            }
+//
             output.append(value);
         }
-//        System.out.println("ASD" + output.toString());
+        System.out.println("ASD" + output.toString());
     }
 
     private void interpretAssignment(AssignmentNode assignmentNode, SymbolTable symbolTable) throws Exception {

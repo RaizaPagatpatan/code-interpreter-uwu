@@ -26,13 +26,13 @@ public class Main {
                 BEGIN CODE
                 
                 #casoplkdasj
-                INT asd, j;
-                asd = 56;
-                INT x;
-                j = 55;
+               
+            
+                Int a;
+                a = 2;
                 #comment only
-                DISPLAY ASD;
-                DISPLAY X;
+                DISPLAY a;
+                
                 
                 END CODE
                 """;
