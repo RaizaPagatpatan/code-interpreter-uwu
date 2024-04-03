@@ -333,6 +333,9 @@ public class Lexer {
         if (ch == '"') {
             return handleStringLiteral();
         }
+        else if (ch == '\'') {
+            return handleCharLiteral();
+        }
         else if (Character.isAlphabetic(ch) || ch == '_') {
             return handleIdentifierOrKeyword();
         }
@@ -341,9 +344,6 @@ public class Lexer {
             return handleNumberLiteral();
         }
         // Character literals
-        else if (ch == '\'') {
-            return handleCharLiteral();
-        }
         else {
             // OPERATORS
             switch (ch) {
@@ -369,8 +369,6 @@ public class Lexer {
                     currentPos++;
                     return new Token(Token.Type.RIGHT_PAREN,")", currentPos);
                 case '=':
-
-                    System.out.println("CHAR AT " + code.charAt(currentPos));
                     currentPos++;
                     if (currentPos < code.length() && code.charAt(currentPos) == '=') {
                         currentPos++;
@@ -458,7 +456,6 @@ public class Lexer {
                 type = Token.Type.NOT;
                 break;
             case "INT":
-                System.out.println("INT");
                 type = Token.Type.INTEGER_LITERAL;
                 break;
             case "CHAR":
@@ -468,7 +465,7 @@ public class Lexer {
                 type = Token.Type.BOOLEAN_LITERAL;
                 break;
             case "FLOAT":
-                type = Token.Type.FLOAT;
+                type = Token.Type.FLOAT_LITERAL;
                 break;
             case "BEGIN":
                 if (currentPos < code.length() && code.charAt(currentPos) == ' ' && currentPos + 4 < code.length() && code.substring(currentPos + 1, currentPos + 5).equals("CODE")) {
@@ -507,12 +504,24 @@ public class Lexer {
     private Token handleNumberLiteral() {
         StringBuilder value = new StringBuilder();
         int tokenStartPos = currentPos;
-        while (currentPos < code.length() && Character.isDigit(code.charAt(currentPos))) {
-            value.append(code.charAt(currentPos));
+        boolean hasDecimal = false; // Flag to track if a decimal point is encountered
+        while (currentPos < code.length() && (Character.isDigit(code.charAt(currentPos)) || code.charAt(currentPos) == '.')) {
+            char currentChar = code.charAt(currentPos);
+            if (currentChar == '.') {
+                if (hasDecimal) {
+                    // If already encountered a decimal point, this is an error, handle accordingly
+                    // For simplicity, let's assume an exception is thrown here
+                    throw new RuntimeException("Invalid double literal");
+                }
+                hasDecimal = true;
+            }
+            value.append(currentChar);
             currentPos++;
         }
-        System.out.println("NUMBER" + value);
-        return new Token(Token.Type.INTEGER_LITERAL, value.toString(), tokenStartPos);
+        // Now, value may contain an integer or a double literal
+        // If it contains a decimal point, parse it as a double, otherwise parse it as an integer
+        Token.Type tokenType = hasDecimal ? Token.Type.FLOAT_LITERAL : Token.Type.INTEGER_LITERAL;
+        return new Token(tokenType, value.toString(), tokenStartPos);
     }
 
     private Token handleCharLiteral() {
@@ -538,6 +547,9 @@ public class Lexer {
                 currentPos++;
             }
             currentPos++;
+        }
+        if (value.toString().equals("\"FALSE\"") ||  value.toString().equals("\"TRUE\"")) {
+            return  new Token(Token.Type.BOOLEAN_LITERAL, value.toString(), tokenStartPos);
         }
         return new Token(Token.Type.STRING_LITERAL, value.toString(), tokenStartPos);
     }

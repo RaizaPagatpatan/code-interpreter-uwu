@@ -16,10 +16,13 @@ public class VariableNode {
                 value = '\0';
                 break;
             case BOOLEAN:
-                value = false;
+                value = "FALSE";
                 break;
             case STRING:
                 value = "";
+                break;
+            case FLOAT:
+                value = 0.0;
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported data type: " + type);

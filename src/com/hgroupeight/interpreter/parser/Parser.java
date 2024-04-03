@@ -24,45 +24,21 @@ public class Parser {
 
         while (lexer.peek().getType() != Token.Type.END_CODE) {
             if (lexer.peek().getType() == Token.Type.INTEGER_LITERAL && lexer.peek().getValue().equals("INT")) {
-//                VariableNode var = parseVariableDeclaration();
-//
-//                System.out.println("VAR " + var);
                 variableDeclarations.addAll(parseVariableDeclarations("INT"));
-            } else {
+            } else if (lexer.peek().getType() == Token.Type.CHAR_LITERAL && lexer.peek().getValue().equals("CHAR")) {
+                variableDeclarations.addAll(parseVariableDeclarations("CHAR"));
+            } else if (lexer.peek().getType() == Token.Type.BOOLEAN_LITERAL && lexer.peek().getValue().equals("BOOL")) {
+                variableDeclarations.addAll(parseVariableDeclarations("BOOL"));
+            } else if (lexer.peek().getType() == Token.Type.FLOAT_LITERAL && lexer.peek().getValue().equals("FLOAT")) {
+                variableDeclarations.addAll(parseVariableDeclarations("FLOAT"));
+            }else {
                 statements.add(parseStatement());
             }
         }
-
-        System.out.println("Variable Declarations: " + variableDeclarations); // Print the variables
+       // Print the variables
         lexer.consume(Token.Type.END_CODE, "END CODE");
-
         return new ProgramNode(variableDeclarations, statements);
     }
-
-    private VariableNode parseVariableDeclaration() throws ParseException {
-        lexer.consume(Token.Type.INTEGER_LITERAL, "INT");
-
-        // Parse the first identifier
-        Token identifier = lexer.getNextToken();
-        DataType dataType = DataType.INTEGER;
-
-        // Check if there's an assignment
-        ExpressionNode expression = null;
-        if (lexer.peek().getType() == Token.Type.EQUAL) {
-            lexer.consume(Token.Type.EQUAL, "==");
-            expression = parseExpression();
-        }
-
-        // Check for comma to continue with more declarations
-        if (lexer.peek().getType() == Token.Type.COMMA) {
-            lexer.consume(Token.Type.COMMA, ",");
-        } else {
-            lexer.consume(Token.Type.SEMICOLON, ";");
-        }
-
-        return new VariableNode(identifier.getValue(), dataType, expression);
-    }
-
 
     private List<VariableNode> parseVariableDeclarations(String type) throws ParseException {
         List<VariableNode> declarations = new ArrayList<>();
@@ -77,6 +53,14 @@ public class Parser {
                 lexer.consume(Token.Type.CHAR_LITERAL, "CHAR");
                 dataType = DataType.CHAR;
                 break;
+            case "BOOL":
+                lexer.consume(Token.Type.BOOLEAN_LITERAL, "BOOL");
+                dataType = DataType.BOOLEAN;
+                break;
+            case "FLOAT":
+                lexer.consume(Token.Type.FLOAT_LITERAL, "FLOAT");
+                dataType = DataType.FLOAT;
+                break;
         }
 
 
@@ -88,11 +72,11 @@ public class Parser {
             if (lexer.peek().getType() == Token.Type.EQUAL) {
                 lexer.consume(Token.Type.EQUAL, "==");
                 expression = parseExpression();
+                System.out.println("EXPRESSION " + expression);
                 declarations.add(new VariableNode(identifier.getValue(), dataType, expression));
             } else {
                 declarations.add(new VariableNode(identifier.getValue(), dataType, expression));
             }
-
             // Check for comma to continue with more declarations
             if (lexer.peek().getType() == Token.Type.COMMA) {
                 lexer.consume(Token.Type.COMMA, ",");
@@ -102,7 +86,6 @@ public class Parser {
         } while (true);
 
         lexer.consume(Token.Type.SEMICOLON, ";");
-
         return declarations;
     }
 
@@ -138,7 +121,6 @@ public class Parser {
         do {
             ExpressionNode expression = parseExpression();
             expressions.add(expression);
-            System.out.println("Parsed expression: " + expression); // Print each parsed expression
         } while (lexer.peek().getType() == Token.Type.CONCATENATE);
 
         lexer.consume(Token.Type.SEMICOLON, ";");
@@ -148,13 +130,12 @@ public class Parser {
 
     private ExpressionNode parseExpression() throws ParseException {
         Token currentToken = lexer.peek();
-        System.out.println("CHECK " + currentToken.getType());
-        System.out.println("IDENTIFIER DISPLAY " + currentToken);
         switch (currentToken.getType()) {
             case INTEGER_LITERAL:
             case CHAR_LITERAL:
             case STRING_LITERAL:
             case IDENTIFIER:
+            case FLOAT_LITERAL:
                 return parseLiteralExpression();
             case KEYWORD:
                 return parseKeywordExpression();
@@ -178,6 +159,9 @@ public class Parser {
                 break;
             case STRING_LITERAL:
                 expressionType = ExpressionNode.ExpressionType.STRING;
+                break;
+            case FLOAT_LITERAL:
+                expressionType = ExpressionNode.ExpressionType.FLOAT;
                 break;
             default:
                 throw new ParseException("Invalid literal expression", lexer.getCurrentPos());

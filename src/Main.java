@@ -28,16 +28,16 @@ public class Main {
                 #casoplkdasj
                
             
-                INT a;
-                a = 2;
+                FLOAT a, b;
+                a = 2.3423;
                 #comment only
                 DISPLAY a;
-                DISPLAY "ASDASD";
+                DISPLAY b;
+       
                 
                 
                 END CODE
                 """;
-
 
 
         // sample code to plug in for test huhu
@@ -59,7 +59,7 @@ public class Main {
         // parse program
         try {
             ProgramNode program = parser.parse();
-            System.out.println("PROGRAM NODE" + program);
+//            System.out.println("PROGRAM NODE\n" + program);
             // 4. AST
             interpreter.interpret(program, symbolTable);
 //            System.out.println("Symbol Table " + symbolTable);
