@@ -120,16 +120,11 @@ public class Lexer {
                     if (currentPos < code.length() && code.charAt(currentPos) == '=') {
                         currentPos++;
                         return new Token(Token.Type.LESS_THAN_EQUAL,"<=", currentPos);
+                    } else if (currentPos < code.length() && code.charAt(currentPos) == '>') {
+                        currentPos++;
+                        return new Token(Token.Type.NOT_EQUAL,"<>", currentPos);
                     } else {
                         return new Token(Token.Type.LESS_THAN,"<", currentPos);
-                    }
-                case '!':
-                    currentPos++;
-                    if (currentPos < code.length() && code.charAt(currentPos) == '=') {
-                        currentPos++;
-                        return new Token(Token.Type.NOT_EQUAL,"!=", currentPos);
-                    } else {
-                        return new Token(Token.Type.NOT,"!", currentPos);
                     }
                 case '&':
                     currentPos++;
