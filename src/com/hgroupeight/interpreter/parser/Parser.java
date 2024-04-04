@@ -205,6 +205,7 @@ public class Parser {
     }
 
     private StatementNode parseStatement() throws ParseException {
+
         if (lexer.peek().getType() == Token.Type.DISPLAY) {
             return parseDisplayStatement();
         } else {

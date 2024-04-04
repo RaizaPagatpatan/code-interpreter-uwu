@@ -24,9 +24,26 @@ public class Main {
         String code =
                 """
                 BEGIN CODE
-                        CHAR e, f, g
-                        SCAN: e, f, g
-                        DISPLAY: "this is the value of e, f, g: " & e & " " & f & " " & g
+                #INT x, y, z
+                #x = 1
+                #y = 2
+                #z = 3
+                #CHAR a
+                #a = 'n'
+                #DISPLAY: x & y & z & "asd" & a
+                
+                        INT x, y, z
+                        z=5
+                        CHAR a_1
+                        a_1='n'
+                        BOOL t 
+                        t="TRUE"
+                        x=y
+                        y=4
+                        a_1='c'
+                        # this is a comment
+                        DISPLAY: x & t & [#] & z & a_1 & "last"
+                
                 END CODE
                 """;
 
