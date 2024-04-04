@@ -42,7 +42,7 @@ public class Main {
                         y=4
                         a_1='c'
                         # this is a comment
-                        DISPLAY: x & t & z  & a_1 & "last"
+                        DISPLAY: x & t & [#] & z & a_1 & "last"
                 
                 END CODE
                 """;

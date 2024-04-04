@@ -47,55 +47,45 @@ public class Token {
 
 
     public enum Type {
+        //CODE - Program Structure
         BEGIN_CODE,
         END_CODE,
+        DISPLAY,
+        CONCATENATE,
+        LINE_BREAK,
+        NEWLINE,
+        LEFT_BRACE, RIGHT_BRACE, // Escape Code
+        COMMA, COLON, // for Variable Declaration and Statement Declaration
+        // Assignment Operator -> '='
+        ASSIGN,
+
+        // CODE - Arithmetic Operators
+        PLUS, MINUS, MULTIPLY,DIVIDE, MODULO, LEFT_PAREN, RIGHT_PAREN, GREATER_THAN, LESS_THAN, GREATER_THAN_EQUAL, LESS_THAN_EQUAL, EQUAL, NOT_EQUAL,
+        // CODE - Logical Operators
+        AND, OR, NOT,
+        // CODE - Unary Operator
+        POSITIVE, NEGATIVE,
+        // CODE -Identifier/ Keywords
+        INTEGER_LITERAL,
+        CHAR_LITERAL,
+        BOOLEAN_LITERAL,
+        STRING_LITERAL,
+        FLOAT_LITERAL,
+        FLOAT,
+        IF, ELSE, IF_ELSE, IDENTIFIER, KEYWORD,
+        // End of File
+        EOF,
         CHAR,
         INTEGER,
-        KEYWORD,
-        IDENTIFIER,
-        DISPLAY,
-        CHAR_LITERAL,
-        STRING_LITERAL,
-        INTEGER_LITERAL,
         OPERATOR,
-        SEMICOLON,
-        DOLLAR,
-        LEFT_BRACE,
-        RIGHT_BRACE,
-        PLUS,
-        MINUS,
-        MULTIPLY,
-        DIVIDE,
-        MODULO,
-        LEFT_PAREN,
-        RIGHT_PAREN,
-        EQUAL,
-        ASSIGN,
-        GREATER_THAN,
-        GREATER_THAN_EQUAL,
-        LESS_THAN,
-        LESS_THAN_EQUAL,
-        NOT_EQUAL,
-        NOT,
-        IF,
-        BOOLEAN_LITERAL,
-        AND,
+
         PRINT,
-        OR,
-        FLOAT,
         BOOLEAN,
         SCAN,
-        COLON,
         COMMENT,
-        FLOAT_LITERAL,
+
         NUM,
-        NUM_FLOAT,
-        IF_ELSE,
-        ELSE,
-        EOF,
-        CONCATENATE,
-        NEWLINE,
-        COMMA, LINE_BREAK;
+        NUM_FLOAT;
 
         private Type() {
         }

@@ -44,6 +44,28 @@ public class Lexer {
             ch = code.charAt(currentPos);
         }
 
+        //ESCAPE CHARA
+        if (ch == '[') {
+            StringBuilder charLiteralBuilder = new StringBuilder();
+            char nextChar = code.charAt(currentPos + 1);
+
+            if (currentPos + 1 < code.length() && isValidEscapeChar(nextChar)) { // I should add a validation if considered as escape character ni siya ... probably add a method?
+                charLiteralBuilder.append(nextChar);
+                currentPos++;
+
+                if (currentPos + 1 < code.length() && code.charAt(currentPos + 1) == ']') {
+                    String charLiteral = charLiteralBuilder.toString();
+                    currentPos += 2;
+                    return new Token(Token.Type.CHAR_LITERAL, charLiteral, currentPos);
+                } else {
+                    throw new RuntimeException("Unclosed or invalid character literal starting at position " + currentPos);
+                }
+            } else {
+                throw new RuntimeException("Invalid character following '[' at position " + (currentPos + 1));
+            }
+        }
+
+
         // COMMENTS
         if (ch == '#') {
             while (currentPos < code.length() && code.charAt(currentPos) != '\n') {
@@ -145,7 +167,7 @@ public class Lexer {
                     return new Token(Token.Type.COLON,":", currentPos);
                 case '$':
                     currentPos++;
-                    return new Token(Token.Type.DOLLAR,"$", currentPos);
+                    return new Token(Token.Type.NEWLINE,"$", currentPos);
                 case '[':
                     currentPos++;
                     return new Token(Token.Type.LEFT_BRACE,"[", currentPos);
@@ -260,6 +282,10 @@ public class Lexer {
         }
         currentPos++;
         return new Token(Token.Type.CHAR_LITERAL, value.toString(), tokenStartPos);
+    }
+
+    private boolean isValidEscapeChar(char c) {
+        return c == '$' || c == '&' || c == '[' || c == ']' || c == '\'' || c == '"' || c == '#';
     }
 
     private Token handleStringLiteral() {
