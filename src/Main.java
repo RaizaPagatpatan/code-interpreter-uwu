@@ -37,7 +37,7 @@ public class Main {
                 DISPLAY: b & a;
                 DISPLAY: "i will now perform arithmetic";
                 INT d;
-                d = 2 + 3 + 4;
+                d = 2 + 3;
                 DISPLAY: d;
                 
                 END CODE
