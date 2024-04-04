@@ -41,6 +41,7 @@ public class VariableNode {
         this.value = value;
     }
 
+
     @Override
     public String toString() {
         return "Variable: " + name + ", Type: " + type + ", Value: " + value;
