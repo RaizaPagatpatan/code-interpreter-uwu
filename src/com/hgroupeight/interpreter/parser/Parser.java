@@ -36,10 +36,8 @@ public class Parser {
             }  else if (lexer.peek().getType() == Token.Type.SCAN) {
                 statements.add(parseScanStatement(variableDeclarations));
             }  else if (lexer.peek().getType() == Token.Type.DISPLAY) {
-                System.out.println("wait whatttt? " + lexer.peek().getType() + lexer.peek().getValue());
                 statements.add(parseDisplayStatement());
             } else {
-                System.out.println("wait what? " + lexer.peek().getType() + lexer.peek().getValue());
                 statements.add(parseStatement());
             }
 
@@ -106,16 +104,19 @@ public class Parser {
         lexer.consume(Token.Type.SCAN, "SCAN");
         lexer.consume(Token.Type.COLON, ":");
 
+        // Scan the whole line and separate by comma
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine();
         String[] inputs = input.split(",");
         int counter = 0;
+
         do {
             Token identifierToken = lexer.getNextToken();
             String identifier = identifierToken.getValue();
 
             // Find the variable declaration with the given identifier
             VariableNode variableNode = null;
+
             for (VariableNode variable : variableDeclarations) {
                 if (variable.getName().equals(identifier)) {
                     variableNode = variable;
@@ -148,11 +149,12 @@ public class Parser {
                 }
 
                 // Update the value of the VariableNode
-                System.out.println("So this is the value " + value);
                 variableNode.setValue(value);
+
+                // Update counter for the input list
                 counter++;
 
-                // Check for comma to continue with more declarations
+                // Check for comma to continue with more values
                 if (lexer.peek().getType() == Token.Type.COMMA) {
                     lexer.consume(Token.Type.COMMA, ",");
                 } else {
@@ -164,36 +166,13 @@ public class Parser {
         } while (true);
 
 
-        // Check if the next token is an unexpected statement
         Token nextToken = lexer.peek();
         if (nextToken.getType() != Token.Type.END_CODE && nextToken.getType() != Token.Type.DISPLAY) {
             throw new ParseException("Unexpected statement after SCAN.", lexer.getCurrentPos());
         }
 
-        return null; // Adjust return statement as needed based on your parser's design
+        return null;
     }
-
-
-
-    private List<String> parseVariableNames() throws ParseException {
-        List<String> identifiers = new ArrayList<>();
-        do {
-            Token identifierToken = lexer.getNextToken();
-            if (identifierToken.getType() != Token.Type.IDENTIFIER) {
-                throw new ParseException("Expected identifier, found: " + identifierToken.getValue(), lexer.getCurrentPos());
-            }
-            identifiers.add(identifierToken.getValue());
-
-            // Check for comma to continue with more variable names
-            if (lexer.peek().getType() == Token.Type.COMMA) {
-                lexer.consume(Token.Type.COMMA, ",");
-            } else {
-                break;
-            }
-        } while (true);
-        return identifiers;
-    }
-
 
 
     private List<StatementNode> parseStatements() throws ParseException {
@@ -215,7 +194,6 @@ public class Parser {
 
     private AssignmentNode parseAssignmentStatement() throws ParseException {
         Token identifier = lexer.getNextToken();
-        System.out.println("Tf are u assigning?");
         lexer.consume(Token.Type.ASSIGN, "=");
         ExpressionNode expression = parseExpression();
 //        lexer.consume(Token.Type.LINE_BREAK, "\n");

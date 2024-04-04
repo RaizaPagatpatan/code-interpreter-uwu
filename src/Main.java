@@ -43,6 +43,9 @@ public class Main {
                         a_1='c'
                         # this is a comment
                         DISPLAY: x & t & [#] & z & a_1 & "last"
+                        INT a, b, c
+                        SCAN: a, b, c
+                        DISPLAY: "this is a and b" & a & b
                 
                 END CODE
                 """;
