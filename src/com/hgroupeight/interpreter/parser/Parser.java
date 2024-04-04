@@ -87,7 +87,7 @@ public class Parser {
             }
         } while (true);
 
-        lexer.consume(Token.Type.SEMICOLON, ";");
+//        lexer.consume(Token.Type.LINE_BREAK, "\n");
         return declarations;
     }
 
@@ -112,7 +112,7 @@ public class Parser {
 
         lexer.consume(Token.Type.ASSIGN, "=");
         ExpressionNode expression = parseExpression();
-        lexer.consume(Token.Type.SEMICOLON, ";");
+//        lexer.consume(Token.Type.LINE_BREAK, "\n");
         return new AssignmentNode(identifier.getValue(), expression);
     }
 
@@ -134,7 +134,7 @@ public class Parser {
             System.out.println("Parsed expression: " + expression); // Print each parsed expression
         } while (lexer.peek().getType() == Token.Type.CONCATENATE);
 
-        lexer.consume(Token.Type.SEMICOLON, ";");
+//        lexer.consume(Token.Type.LINE_BREAK, "\n");
         return new DisplayNode(expressions);
     }
 

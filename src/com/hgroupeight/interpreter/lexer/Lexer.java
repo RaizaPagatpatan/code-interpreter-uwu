@@ -137,9 +137,14 @@ public class Lexer {
                 case ',':
                     currentPos++;
                     return new Token(Token.Type.COMMA,",", currentPos);
-                case ';':
+//                case ';':
+////                    currentPos++;
+//                    currentPos++;
+//                    return getNextToken();
+////                    return new Token(Token.Type.SEMICOLON,";", currentPos);
+                case '\n': // Treat line breaks as token separators
                     currentPos++;
-                    return new Token(Token.Type.SEMICOLON,";", currentPos);
+                    return new Token(Token.Type.LINE_BREAK, "\n", currentPos);
                 case ':':
                     currentPos++;
                     return new Token(Token.Type.COLON,":", currentPos);

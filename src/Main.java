@@ -24,17 +24,26 @@ public class Main {
         String code =
                 """
                 BEGIN CODE
-
-                #casoplkdasj
-
-                INT a;
-                a = 2;
-                #comment only
-                DISPLAY: a;
-                DISPLAY: "ASDASD";
-                CHAR b;
-                b = 'b';
-                DISPLAY: b & a;
+                #INT x, y, z
+                #x = 1
+                #y = 2
+                #z = 3
+                #CHAR a
+                #a = 'n'
+                #DISPLAY: x & y & z & "asd" & a
+                
+                        INT x, y, z
+                        z=5
+                        CHAR a_1
+                        a_1='n'
+                        BOOL t 
+                        t="TRUE"
+                        x=y
+                        y=4
+                        a_1='c'
+                        # this is a comment
+                        DISPLAY: x & t & z  & a_1 & "last"
+                
                 END CODE
                 """;
 
@@ -42,12 +51,12 @@ public class Main {
 
         // sample code to plug in for test huhu
         //                INT x, y, z=5
-        //                CHAR a_1=’n’
-        //                BOOL t=”TRUE”
+        //                CHAR a_1='n'
+        //                BOOL t="TRUE"
         //                x=y=4
-        //                a_1=’c’
+        //                a_1='c'
         //                # this is a comment
-        //                DISPLAY: x & t & z & $ & a_1 & [#] & “last”
+        //                DISPLAY: x & t & z & $ & a_1 & [#] & "last"
 
 
         // 2. lexer, parser, symbol table, and interpreter
@@ -70,26 +79,73 @@ public class Main {
         }
     }
 }
-//SCANNER TYPE NGA READER/INTERPRETER PLSPLSPLS DONT REMOVE OR MODIFY
-
-//import com.hgroupeight.interpreter.lexer.Lexer;
-//
-//import java.util.Scanner;
-//
-//public class Main {
-//
-//    public static void main(String[] args) throws Exception {
-//        Scanner scan = new Scanner(System.in);
-//
-//        while (true) {
-//            System.out.println("Enter code:");
-//            String code = scan.nextLine();
-//            Lexer lexer = new Lexer(code);
-//            lexer.lex();
-//        }
-//    }
-//}
-//import com.hgroupeight.interpreter.lexer.Lexer;
+//////SCANNER TYPE NGA READER/INTERPRETER PLSPLSPLS DONT REMOVE OR MODIFY
+////
+//////import com.hgroupeight.interpreter.lexer.Lexer;
+//////
+//////import java.util.Scanner;
+//////
+//////public class Main {
+//////
+//////    public static void main(String[] args) throws Exception {
+//////        Scanner scan = new Scanner(System.in);
+//////
+//////        while (true) {
+//////            System.out.println("Enter code:");
+//////            String code = scan.nextLine();
+//////            Lexer lexer = new Lexer(code);
+//////            lexer.lex();
+//////        }
+//////    }
+//////}
+//////import com.hgroupeight.interpreter.lexer.Lexer;
+//////
+//////import com.hgroupeight.interpreter.interpreter.Interpreter;
+//////import com.hgroupeight.interpreter.lexer.Lexer;
+//////import com.hgroupeight.interpreter.parser.Parser;
+//////import com.hgroupeight.interpreter.symboltable.SymbolTable;
+//////
+//////import java.text.ParseException;
+//////import java.util.Scanner;
+////
+//////public class Main {
+//////
+//////    public static void main(String[] args) {
+//////        Scanner scanner = new Scanner(System.in);
+//////        Interpreter interpreter = new Interpreter();
+//////
+//////        while (true) {
+//////            System.out.println("Enter CODE program (type 'exit' to quit):");
+//////            StringBuilder codeBuilder = new StringBuilder();
+//////
+//////            while (true) {
+//////                String line = scanner.nextLine().trim();
+//////                if (line.equalsIgnoreCase("END CODE")) {
+//////                    break;
+//////                }
+//////                codeBuilder.append(line).append("\n");
+//////            }
+//////
+//////            String code = codeBuilder.toString();
+//////
+//////            if (code.equalsIgnoreCase("exit")) {
+//////                System.out.println("Exiting...");
+//////                break;
+//////            }
+//////
+//////            try {
+//////                Lexer lexer = new Lexer(code);
+//////                Parser parser = new Parser(lexer);
+//////                SymbolTable symbolTable = new SymbolTable();
+//////                interpreter.interpret(parser.parse(), symbolTable);
+//////            } catch (ParseException e) {
+//////                System.err.println("Parsing error: " + e.getMessage());
+//////            } catch (Exception e) {
+//////                System.err.println("Unexpected error: " + e.getMessage());
+//////            }
+//////        }
+//////    }
+//////}
 //
 //import com.hgroupeight.interpreter.interpreter.Interpreter;
 //import com.hgroupeight.interpreter.lexer.Lexer;
@@ -98,7 +154,7 @@ public class Main {
 //
 //import java.text.ParseException;
 //import java.util.Scanner;
-
+//
 //public class Main {
 //
 //    public static void main(String[] args) {
@@ -125,8 +181,11 @@ public class Main {
 //            }
 //
 //            try {
+//                // Lexical Analysis
 //                Lexer lexer = new Lexer(code);
+//                // Syntactical Analysis
 //                Parser parser = new Parser(lexer);
+//                // Interpretation
 //                SymbolTable symbolTable = new SymbolTable();
 //                interpreter.interpret(parser.parse(), symbolTable);
 //            } catch (ParseException e) {
