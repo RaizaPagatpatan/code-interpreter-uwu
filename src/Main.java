@@ -43,6 +43,10 @@ public class Main {
                         a_1='c'
                         # this is a comment
                         DISPLAY: x & t & z  & a_1 & "last"
+                        DISPLAY: "now trying to scan"
+                        CHAR e
+                        SCAN: e
+                        DISPLAY: "this is the value of e: " & e
                 
                 END CODE
                 """;

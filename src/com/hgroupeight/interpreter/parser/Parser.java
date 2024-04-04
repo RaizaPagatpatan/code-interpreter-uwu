@@ -8,6 +8,7 @@ import javax.xml.crypto.Data;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Parser {
     private final Lexer lexer;
@@ -32,9 +33,13 @@ public class Parser {
                 variableDeclarations.addAll(parseVariableDeclarations("BOOL"));
             } else if (lexer.peek().getType() == Token.Type.FLOAT_LITERAL && lexer.peek().getValue().equals("FLOAT")) {
                 variableDeclarations.addAll(parseVariableDeclarations("FLOAT"));
-            }else {
+            }  else if (lexer.peek().getType() == Token.Type.SCAN) {
+                statements.add(parseScanStatement(variableDeclarations));
+            } else {
+                System.out.println("wait what? " + lexer.peek().getType() + lexer.peek().getValue());
                 statements.add(parseStatement());
             }
+
         }
        // Print the variables
         lexer.consume(Token.Type.END_CODE, "END CODE");
@@ -47,6 +52,7 @@ public class Parser {
         DataType dataType = null;
 
         switch (type) {
+            case "INTEGER":
             case "INT":
                 lexer.consume(Token.Type.INTEGER_LITERAL, "INT");
                 dataType = DataType.INTEGER;
@@ -63,6 +69,8 @@ public class Parser {
                 lexer.consume(Token.Type.FLOAT_LITERAL, "FLOAT");
                 dataType = DataType.FLOAT;
                 break;
+            default:
+                throw new ParseException("Invalid data type: " + dataType, lexer.getCurrentPos());
         }
 
 
@@ -91,6 +99,61 @@ public class Parser {
         return declarations;
     }
 
+    private AssignmentNode parseScanStatement(List<VariableNode> variableDeclarations) throws ParseException {
+        lexer.consume(Token.Type.SCAN, "SCAN");
+        lexer.consume(Token.Type.COLON, ":");
+
+        Scanner scanner = new Scanner(System.in);
+        do {
+            Token identifierToken = lexer.getNextToken();
+            String identifier = identifierToken.getValue();
+
+            // Find the variable declaration with the given identifier
+            VariableNode variableNode = null;
+            for (VariableNode variable : variableDeclarations) {
+                if (variable.getName().equals(identifier)) {
+                    variableNode = variable;
+                    break;
+                }
+            }
+
+            if (variableNode != null) {
+                DataType dataType = variableNode.getType();
+
+                System.out.print("Enter value for " + identifier + " (" + dataType + "): ");
+                String input = scanner.next();
+
+                Object value;
+                // Parse input according to data type
+                switch (dataType) {
+                    case INTEGER:
+                        value = Integer.parseInt(input);
+                        break;
+                    case CHAR:
+                        if (input.length() != 1) {
+                            throw new ParseException("Invalid input for CHAR type.", lexer.getCurrentPos());
+                        }
+                        value = input.charAt(0);
+                        break;
+                    case BOOLEAN:
+                        value = Boolean.parseBoolean(input);
+                        break;
+                    case FLOAT:
+                        value = Float.parseFloat(input);
+                        break;
+                    default:
+                        throw new ParseException("Unsupported data type.", lexer.getCurrentPos());
+                }
+                System.out.println("Tf are u assigning?");
+                ExpressionNode expression = new LiteralNode(getExpressionType(dataType), value);
+                return new AssignmentNode(identifier, expression);
+            } else {
+                throw new ParseException("Variable " + identifier + " not declared.", lexer.getCurrentPos());
+            }
+        } while (true);
+    }
+
+
     private List<StatementNode> parseStatements() throws ParseException {
         List<StatementNode> statements = new ArrayList<>();
         while (lexer.peek().getType() != Token.Type.END_CODE) {
@@ -109,7 +172,7 @@ public class Parser {
 
     private AssignmentNode parseAssignmentStatement() throws ParseException {
         Token identifier = lexer.getNextToken();
-
+        System.out.println("Tf are u assigning?");
         lexer.consume(Token.Type.ASSIGN, "=");
         ExpressionNode expression = parseExpression();
 //        lexer.consume(Token.Type.LINE_BREAK, "\n");
@@ -209,6 +272,21 @@ public class Parser {
                 throw new ParseException("Invalid literal expression", lexer.getCurrentPos());
         }
         return new LiteralNode(expressionType, token.getValue());
+    }
+
+    ExpressionNode.ExpressionType getExpressionType(DataType dataType) {
+        switch (dataType) {
+            case INTEGER:
+                return ExpressionNode.ExpressionType.INTEGER;
+            case CHAR:
+                return ExpressionNode.ExpressionType.CHARACTER;
+            case BOOLEAN:
+                return ExpressionNode.ExpressionType.BOOLEAN;
+            case FLOAT:
+                return ExpressionNode.ExpressionType.FLOAT;
+            default:
+                throw new IllegalArgumentException("Unsupported data type: " + dataType);
+        }
     }
 
     private ExpressionNode parseKeywordExpression() throws ParseException {

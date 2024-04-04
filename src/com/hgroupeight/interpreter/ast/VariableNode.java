@@ -35,6 +35,8 @@ public class VariableNode {
 
     public Object getValue() { return  value; }
 
+    public DataType getType() { return  type; }
+
     public void setValue(Object value) {
         this.value = value;
     }
