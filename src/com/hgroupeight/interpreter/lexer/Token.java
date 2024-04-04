@@ -95,7 +95,9 @@ public class Token {
         EOF,
         CONCATENATE,
         NEWLINE,
-        COMMA;
+        COMMA,
+        NEGATIVE,
+        POSITIVE;
 
         private Type() {
         }

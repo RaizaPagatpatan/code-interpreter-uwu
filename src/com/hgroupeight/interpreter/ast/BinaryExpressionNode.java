@@ -81,30 +81,19 @@ public class BinaryExpressionNode extends ExpressionNode {
 
 
     public enum BinaryOperator {
-        ADDITION("+"),
-        SUBTRACTION("-"),
-        MULTIPLICATION("*"),
-        DIVISION("/"),
-        EQUAL("=="),
-        NOT_EQUAL("<>"),
-        LESS_THAN("<"),
-        LESS_THAN_EQUAL("<="),
-        GREATER_THAN(">"),
-        GREATER_THAN_EQUAL(">="),
-        LOGICAL_AND("AND"),
-        LOGICAL_OR("OR"),
-        CONCATENATE("&");
-
-
-        private final String symbol;
-
-        BinaryOperator(String symbol) {
-            this.symbol = symbol;
-        }
-
-        public String getSymbol() {
-            return symbol;
-        }
+        PLUS,
+        MINUS,
+        MULTIPLY,
+        DIVIDE,
+        EQUAL,
+        NOT_EQUAL,
+        LESS_THAN,
+        LESS_THAN_EQUAL,
+        GREATER_THAN,
+        GREATER_THAN_EQUAL,
+        LOGICAL_AND,
+        LOGICAL_OR,
+        CONCATENATE;
     }
 
     public BinaryExpressionNode(ExpressionType expressionType) {
@@ -116,20 +105,17 @@ public class BinaryExpressionNode extends ExpressionNode {
         Object leftValue = left.evaluate(symbolTable);
         Object rightValue = right.evaluate(symbolTable);
 
-        if (operator.equals(BinaryOperator.CONCATENATE)) {
-            return leftValue.toString() + rightValue.toString();
-        }
         if (leftValue instanceof Integer && rightValue instanceof Integer) {
             int leftInt = (Integer) leftValue;
             int rightInt = (Integer) rightValue;
             switch (operator) {
-                case ADDITION:
+                case PLUS:
                     return leftInt + rightInt;
-                case SUBTRACTION:
+                case MINUS:
                     return leftInt - rightInt;
-                case MULTIPLICATION:
+                case MULTIPLY:
                     return leftInt * rightInt;
-                case DIVISION:
+                case DIVIDE:
                     if (rightInt == 0) {
                         throw new Exception("Division by zero");
                     }
@@ -165,3 +151,6 @@ public class BinaryExpressionNode extends ExpressionNode {
         }
     }
 }
+
+// Removed symbols
+// Changed enum names to fit the Token type names

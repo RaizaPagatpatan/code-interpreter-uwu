@@ -33,8 +33,13 @@ public class Main {
                 DISPLAY: a;
                 DISPLAY: "ASDASD";
                 CHAR b;
-                b = 'b';
+                b = 3;
                 DISPLAY: b & a;
+                DISPLAY: "i will now perform arithmetic";
+                INT d;
+                d = 2 + 3 + 4;
+                DISPLAY: d;
+                
                 END CODE
                 """;
 

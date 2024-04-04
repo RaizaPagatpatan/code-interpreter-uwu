@@ -3,6 +3,7 @@ package com.hgroupeight.interpreter.parser;
 import com.hgroupeight.interpreter.ast.*;
 import com.hgroupeight.interpreter.lexer.Lexer;
 import com.hgroupeight.interpreter.lexer.Token;
+import com.hgroupeight.interpreter.ast.BinaryExpressionNode.BinaryOperator;
 
 import javax.xml.crypto.Data;
 import java.text.ParseException;
@@ -32,7 +33,7 @@ public class Parser {
                 variableDeclarations.addAll(parseVariableDeclarations("BOOL"));
             } else if (lexer.peek().getType() == Token.Type.FLOAT_LITERAL && lexer.peek().getValue().equals("FLOAT")) {
                 variableDeclarations.addAll(parseVariableDeclarations("FLOAT"));
-            }else {
+            } else {
                 statements.add(parseStatement());
             }
         }
@@ -64,7 +65,6 @@ public class Parser {
                 dataType = DataType.FLOAT;
                 break;
         }
-
 
         do {
             Token identifier = lexer.getNextToken();
@@ -100,6 +100,7 @@ public class Parser {
     }
 
     private StatementNode parseStatement() throws ParseException {
+        System.out.print(lexer.peek().getType() + " huh?");
         if (lexer.peek().getType() == Token.Type.DISPLAY) {
             return parseDisplayStatement();
         } else {
@@ -108,14 +109,38 @@ public class Parser {
     }
 
     private AssignmentNode parseAssignmentStatement() throws ParseException {
+        System.out.println("Did i get here????");
         Token identifier = lexer.getNextToken();
-
+        ExpressionNode expression;
         lexer.consume(Token.Type.ASSIGN, "=");
-        ExpressionNode expression = parseExpression();
+        expression = parseExpression();
+        System.out.println(("???????"));
+        if (lexer.peek().getType() == Token.Type.PLUS || lexer.peek().getType() == Token.Type.MINUS || lexer.peek().getType() == Token.Type.MULTIPLY || lexer.peek().getType() == Token.Type.DIVIDE){
+            lexer.consume(lexer.peek().getType(), lexer.peek().getValue());
+            System.out.println("Did i get here?");
+            expression = parseArithmeticExpression();
+            System.out.println(("1 "));
+        }
         lexer.consume(Token.Type.SEMICOLON, ";");
         return new AssignmentNode(identifier.getValue(), expression);
     }
 
+    private ExpressionNode parseArithmeticExpression() throws ParseException {
+        System.out.println("Did i get here?");
+        ExpressionNode left = term(); // Parse the left operand
+        while (lexer.peek().getType() == Token.Type.PLUS || lexer.peek().getType() == Token.Type.MINUS) {
+            Token operator = lexer.getNextToken(); // Get the operator token
+            ExpressionNode right = term(); // Parse the right operand
+            BinaryOperator op;
+            if (operator.getType() == Token.Type.PLUS) {
+                op = BinaryOperator.PLUS;
+            } else {
+                op = BinaryOperator.MINUS;
+            }
+            left = new BinaryExpressionNode(left, right, op); // Create the binary expression node
+        }
+        return left;
+    }
     private DisplayNode parseDisplayStatement() throws ParseException {
         int displayLine = currentLine; // for catching line errors only
         lexer.consume(Token.Type.DISPLAY, "DISPLAY");
@@ -151,41 +176,12 @@ public class Parser {
                 return parseLiteralExpression();
             case KEYWORD:
                 return parseKeywordExpression();
-//            case CONCATENATE:
-//                return parseConcatExpression();
             default:
                 throw new ParseException("Unexpected token: " + currentToken.getValue(), lexer.peek().getPosition());
         }
     }
 
-//    private ExpressionNode parseConcatExpression() throws ParseException {
-//        List<ExpressionNode> expressions = new ArrayList<>();
-//        int count = 0;
-////        do {
-////            count++;
-////            expressions.add(parseExpression());
-////            if (lexer.peek().getType() == Token.Type.CONCATENATE) {
-////                lexer.getNextToken();
-////            } else {
-////                break;
-////            }
-////        } while (count <= 5);
-//
-//        return buildConcatenation(expressions);
-//    }
-//
-//    private ExpressionNode buildConcatenation(List<ExpressionNode> expressions) {
-//        // Assuming a simple left-associative concatenation
-//        if (expressions.size() == 1) {
-//            return expressions.get(0);
-//        } else {
-//            ExpressionNode result = expressions.get(0);
-//            for (int i = 1; i < expressions.size(); i++) {
-//                result = new BinaryExpressionNode(result, expressions.get(i), BinaryExpressionNode.BinaryOperator.CONCATENATE);
-//            }
-//            return result;
-//        }
-//    }
+
     private LiteralNode parseLiteralExpression() throws ParseException {
         Token token = lexer.getNextToken();
         ExpressionNode.ExpressionType expressionType;
@@ -221,4 +217,55 @@ public class Parser {
                 throw new ParseException("Invalid keyword expression: " + token.getValue(), lexer.peek().getPosition());
         }
     }
-}
+
+    private ExpressionNode term() throws ParseException {
+        ExpressionNode expr = factor();
+        System.out.println("Did i get here too?");
+        System.out.println("Wtf are u returning" + expr.getClass().getName());
+        while (lexer.peek().getType() == Token.Type.PLUS || lexer.peek().getType() == Token.Type.MINUS) {
+            BinaryOperator op = null;
+            if (lexer.peek().getType() == Token.Type.PLUS) {
+                op = BinaryOperator.PLUS;
+                lexer.consume(Token.Type.PLUS, "+"); // Consume the PLUS token
+                System.out.println("Should be here, right...");
+            } else if (lexer.peek().getType() == Token.Type.MINUS) {
+                op = BinaryOperator.MINUS;
+                lexer.consume(Token.Type.MINUS, "-"); // Consume the MINUS token
+            }
+
+            System.out.println("Parsed expression: " + expr); // Print each parsed expression
+            ExpressionNode right = factor();
+
+            expr = new BinaryExpressionNode(expr, right, op);
+
+        }
+
+        return expr;
+    }
+
+        private ExpressionNode factor()  throws ParseException {
+            System.out.println("Did i get here here here?");
+            ExpressionNode expr =  parseExpression();
+
+            while (lexer.peek().getType() == Token.Type.DIVIDE || lexer.peek().getType() == Token.Type.MULTIPLY) {
+                BinaryOperator op = null;
+                if (lexer.peek().getType() == Token.Type.DIVIDE) {
+                    op = BinaryOperator.DIVIDE;
+                    lexer.consume(Token.Type.DIVIDE, "/"); // Consume the PLUS token
+                } else if (lexer.peek().getType() == Token.Type.MULTIPLY) {
+                    op = BinaryOperator.MULTIPLY;
+                    lexer.consume(Token.Type.MULTIPLY, "*"); // Consume the PLUS token
+                }
+
+                System.out.println("Parsed expression: " + expr); // Print each parsed expression
+                ExpressionNode right = factor();
+
+                expr = new BinaryExpressionNode(expr, right, op);
+
+            }
+            return expr;
+        }
+
+
+        }
+
