@@ -24,12 +24,15 @@ public class Main {
         String code =
                 """
                 BEGIN CODE
-                INT a;
-                a = 4;
+                
+                #casoplkdasj
+               
+            
+                FLOAT a, b;
+                a = 2.3423;
                 #comment only
                 DISPLAY a;
-
-
+                DISPLAY b;
        
                 
                 

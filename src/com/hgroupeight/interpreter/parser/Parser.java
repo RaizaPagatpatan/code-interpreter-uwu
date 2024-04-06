@@ -8,9 +8,11 @@ import javax.xml.crypto.Data;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Parser {
     private final Lexer lexer;
+    private int currentLine = 1;
 
     public Parser(Lexer lexer) {
         this.lexer = lexer;
@@ -23,19 +25,17 @@ public class Parser {
 
 
         while (lexer.peek().getType() != Token.Type.END_CODE) {
-            Token peekedToken = lexer.peek();
-            if (peekedToken.getType() == Token.Type.INTEGER_LITERAL && peekedToken.getValue().equals("INT")) {
+            if (lexer.peek().getType() == Token.Type.INTEGER_LITERAL && lexer.peek().getValue().equals("INT")) {
                 variableDeclarations.addAll(parseVariableDeclarations("INT"));
-            } else if (peekedToken.getType() == Token.Type.CHAR_LITERAL && peekedToken.getValue().equals("CHAR")) {
+            } else if (lexer.peek().getType() == Token.Type.CHAR_LITERAL && lexer.peek().getValue().equals("CHAR")) {
                 variableDeclarations.addAll(parseVariableDeclarations("CHAR"));
-            } else if (peekedToken.getType() == Token.Type.BOOLEAN_LITERAL && peekedToken.getValue().equals("BOOL")) {
+            } else if (lexer.peek().getType() == Token.Type.BOOLEAN_LITERAL && lexer.peek().getValue().equals("BOOL")) {
                 variableDeclarations.addAll(parseVariableDeclarations("BOOL"));
-            } else if (peekedToken.getType() == Token.Type.FLOAT_LITERAL && peekedToken.getValue().equals("FLOAT")) {
+            } else if (lexer.peek().getType() == Token.Type.FLOAT_LITERAL && lexer.peek().getValue().equals("FLOAT")) {
                 variableDeclarations.addAll(parseVariableDeclarations("FLOAT"));
-            } else {
+            }else {
                 statements.add(parseStatement());
             }
-            lexer.line++;
         }
        // Print the variables
         lexer.consume(Token.Type.END_CODE, "END CODE");
@@ -48,6 +48,7 @@ public class Parser {
         DataType dataType = null;
 
         switch (type) {
+            case "INTEGER":
             case "INT":
                 lexer.consume(Token.Type.INTEGER_LITERAL, "INT");
                 dataType = DataType.INTEGER;
@@ -64,7 +65,10 @@ public class Parser {
                 lexer.consume(Token.Type.FLOAT_LITERAL, "FLOAT");
                 dataType = DataType.FLOAT;
                 break;
+            default:
+                throw new ParseException("Invalid data type: " + dataType, lexer.getCurrentPos());
         }
+
 
         do {
             Token identifier = lexer.getNextToken();
@@ -81,7 +85,6 @@ public class Parser {
                 // No assignment, add the variable declaration without expression
                 declarations.add(new VariableNode(identifier.getValue(), dataType, null));
             }
-
             // Check for comma to continue with more declarations
             if (lexer.peek().getType() == Token.Type.COMMA) {
                 lexer.consume(Token.Type.COMMA, ",");
@@ -90,9 +93,84 @@ public class Parser {
             }
         } while (true);
 
-        lexer.consume(Token.Type.SEMICOLON, ";");
+//        lexer.consume(Token.Type.LINE_BREAK, "\n");
         return declarations;
     }
+
+    private StatementNode parseScanStatement(List<VariableNode> variableDeclarations) throws ParseException {
+        lexer.consume(Token.Type.SCAN, "SCAN");
+        lexer.consume(Token.Type.COLON, ":");
+
+        // Scan the whole line and separate by comma
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine();
+        String[] inputs = input.split(",");
+        int counter = 0;
+
+        do {
+            Token identifierToken = lexer.getNextToken();
+            String identifier = identifierToken.getValue();
+
+            // Find the variable declaration with the given identifier
+            VariableNode variableNode = null;
+
+            for (VariableNode variable : variableDeclarations) {
+                if (variable.getName().equals(identifier)) {
+                    variableNode = variable;
+                    break;
+                }
+            }
+
+            if (variableNode != null) {
+                DataType dataType = variableNode.getType();
+                Object value;
+                // Parse input according to data type
+                switch (dataType) {
+                    case INTEGER:
+                        value = Integer.parseInt(inputs[counter]);
+                        break;
+                    case CHAR:
+                        if (inputs[counter].length() != 1) {
+                            throw new ParseException("Invalid input for CHAR type.", lexer.getCurrentPos());
+                        }
+                        value = inputs[counter];
+                        break;
+                    case BOOLEAN:
+                        value = Boolean.parseBoolean(inputs[counter]);
+                        break;
+                    case FLOAT:
+                        value = Float.parseFloat(inputs[counter]);
+                        break;
+                    default:
+                        throw new ParseException("Unsupported data type.", lexer.getCurrentPos());
+                }
+
+                // Update the value of the VariableNode
+                variableNode.setValue(value);
+
+                // Update counter for the input list
+                counter++;
+
+                // Check for comma to continue with more values
+                if (lexer.peek().getType() == Token.Type.COMMA) {
+                    lexer.consume(Token.Type.COMMA, ",");
+                } else {
+                    break;
+                }
+            } else {
+                throw new ParseException("Variable " + identifier + " not declared.", lexer.getCurrentPos());
+            }
+        } while (true);
+
+
+        Token nextToken = lexer.peek();
+        if (nextToken.getType() != Token.Type.END_CODE && nextToken.getType() != Token.Type.DISPLAY) {
+            throw new ParseException("Unexpected statement after SCAN.", lexer.getCurrentPos());
+        }
+
+        return null;
+    }
+
 
     private List<StatementNode> parseStatements() throws ParseException {
         List<StatementNode> statements = new ArrayList<>();
@@ -103,6 +181,7 @@ public class Parser {
     }
 
     private StatementNode parseStatement() throws ParseException {
+
         if (lexer.peek().getType() == Token.Type.DISPLAY) {
             return parseDisplayStatement();
         } else {
@@ -133,12 +212,14 @@ public class Parser {
         // If identifier not found, throw ParseException
 
         ExpressionNode expression = parseExpression();
-        lexer.consume(Token.Type.SEMICOLON, ";");
+//        lexer.consume(Token.Type.LINE_BREAK, "\n");
         return new AssignmentNode(identifier.getValue(), expression);
     }
 
     private DisplayNode parseDisplayStatement() throws ParseException {
+        int displayLine = currentLine; // for catching line errors only
         lexer.consume(Token.Type.DISPLAY, "DISPLAY");
+//        lexer.consume(Token.Type.COLON, ":");
         List<ExpressionNode> expressions = new ArrayList<>();
 
         ExpressionNode expression = parseExpression();
@@ -153,10 +234,9 @@ public class Parser {
             System.out.println("Parsed expression: " + expression); // Print each parsed expression
         } while (lexer.peek().getType() == Token.Type.CONCATENATE);
 
-        lexer.consume(Token.Type.SEMICOLON, ";");
+//        lexer.consume(Token.Type.LINE_BREAK, "\n");
         return new DisplayNode(expressions);
     }
-
 
     private ExpressionNode parseExpression() throws ParseException {
         Token currentToken = lexer.peek();
@@ -229,6 +309,21 @@ public class Parser {
                 throw new ParseException("Invalid literal expression", lexer.getCurrentPos());
         }
         return new LiteralNode(expressionType, token.getValue());
+    }
+
+    ExpressionNode.ExpressionType getExpressionType(DataType dataType) {
+        switch (dataType) {
+            case INTEGER:
+                return ExpressionNode.ExpressionType.INTEGER;
+            case CHAR:
+                return ExpressionNode.ExpressionType.CHARACTER;
+            case BOOLEAN:
+                return ExpressionNode.ExpressionType.BOOLEAN;
+            case FLOAT:
+                return ExpressionNode.ExpressionType.FLOAT;
+            default:
+                throw new IllegalArgumentException("Unsupported data type: " + dataType);
+        }
     }
 
     private ExpressionNode parseKeywordExpression() throws ParseException {
