@@ -5,6 +5,12 @@ public class VariableNode {
     public DataType type;
     public Object value;
 
+    public VariableNode(String name, DataType type, ExpressionNode expression, Object value) {
+        this.name = name;
+        this.type = type;
+        this.value = value;
+    }
+
     public VariableNode(String name, DataType type, ExpressionNode expression) {
         this.name = name;
         this.type = type;

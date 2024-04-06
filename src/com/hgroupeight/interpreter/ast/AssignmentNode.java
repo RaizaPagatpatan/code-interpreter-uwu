@@ -11,6 +11,10 @@ public class AssignmentNode extends StatementNode {
         this.expression = expression;
     }
 
+    public String getVariableName() {
+        return variableName;
+    }
+
     @Override
     public void execute(SymbolTable symbolTable) throws Exception {
         Object value = expression.evaluate(symbolTable);

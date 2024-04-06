@@ -282,12 +282,16 @@ import java.util.List;
 public class Lexer {
     public String code;
     private int currentPos;
+
     private boolean inString;
+
+    public int line;
 
     public Lexer(String code) {
         this.code = code;
         this.currentPos = 0;
         this.inString = false;
+        line = 1;
     }
 
     public List<Token> lex() throws ParseException {
@@ -418,6 +422,129 @@ public class Lexer {
                 case ']':
                     currentPos++;
                     return new Token(Token.Type.RIGHT_BRACE,"]", currentPos);
+                default:
+                    throw new RuntimeException("Unexpected character: " + ch);
+            }
+        }
+    }
+
+    public Token getPrevToken() {
+        int tempPost = currentPos-1;
+        if (tempPost <= 0) {
+            return new Token(Token.Type.EOF, null, tempPost);
+        }
+
+        char ch = code.charAt(tempPost);
+
+        // Skip whitespace
+        while (Character.isWhitespace(ch)) {
+            tempPost--;
+            if (tempPost >= code.length()) {
+                return new Token(Token.Type.EOF, null, tempPost);
+            }
+            ch = code.charAt(tempPost);
+        }
+
+        // COMMENTS
+        if (ch == '#') {
+            while (tempPost < code.length() && code.charAt(tempPost) != '\n') {
+                tempPost--;
+            }
+            return getNextToken(); //SKIP COMMENTS!
+        }
+
+        // Handle other token types
+        // Identifiers and keywords
+        // String literals
+        if (ch == '"') {
+            return handleStringLiteral();
+        }
+        else if (ch == '\'') {
+            return handleCharLiteral();
+        }
+        else if (Character.isAlphabetic(ch) || ch == '_') {
+            return handleIdentifierOrKeyword();
+        }
+        // Number literals
+        else if (Character.isDigit(ch)) {
+            return handleNumberLiteral();
+        }
+
+        // Character literals
+        else {
+            // OPERATORS
+            switch (ch) {
+                case '+':
+                    tempPost--;
+                    return new Token(Token.Type.PLUS, "+", tempPost);
+                case '-':
+                    tempPost--;
+                    return new Token(Token.Type.MINUS,"-", tempPost);
+                case '*':
+                    tempPost--;
+                    return new Token(Token.Type.MULTIPLY,"*", tempPost);
+                case '/':
+                    tempPost--;
+                    return new Token(Token.Type.DIVIDE,"/", tempPost);
+                case '%':
+                    tempPost--;
+                    return new Token(Token.Type.MODULO,"%", tempPost);
+                case '(':
+                    tempPost--;
+                    return new Token(Token.Type.LEFT_PAREN,"(", tempPost);
+                case ')':
+                    tempPost--;
+                    return new Token(Token.Type.RIGHT_PAREN,")", tempPost);
+                case '=':
+                    tempPost--;
+                    if (tempPost < code.length() && code.charAt(tempPost) == '=') {
+                        tempPost--;
+                        return new Token(Token.Type.EQUAL,"==", tempPost);
+                    } else {
+                        return new Token(Token.Type.ASSIGN,"=", tempPost);
+                    }
+                case '>':
+                    tempPost--;
+                    if (tempPost < code.length() && code.charAt(tempPost) == '=') {
+                        tempPost--;
+                        return new Token(Token.Type.GREATER_THAN_EQUAL,">=", tempPost);
+                    } else {
+                        return new Token(Token.Type.GREATER_THAN,">", tempPost);
+                    }
+                case '<':
+                    tempPost--;
+                    if (tempPost < code.length() && code.charAt(tempPost) == '=') {
+                        tempPost--;
+                        return new Token(Token.Type.LESS_THAN_EQUAL,"<=", tempPost);
+                    } else {
+                        return new Token(Token.Type.LESS_THAN,"<", tempPost);
+                    }
+                case '!':
+                    tempPost--;
+                    if (tempPost < code.length() && code.charAt(tempPost) == '=') {
+                        tempPost--;
+                        return new Token(Token.Type.NOT_EQUAL,"!=", tempPost);
+                    } else {
+                        return new Token(Token.Type.NOT,"!", tempPost);
+                    }
+                case '&':
+                    tempPost--;
+                    return new Token(Token.Type.CONCATENATE,"&", tempPost);
+                case ',':
+                    tempPost--;
+                    return new Token(Token.Type.COMMA,",", tempPost);
+                case ';':
+                    tempPost--;
+                    return new Token(Token.Type.SEMICOLON,";", tempPost);
+                case '$':
+                    tempPost--;
+                    return new Token(Token.Type.DOLLAR,"$", tempPost);
+                case '[':
+                    tempPost--;
+                    return new Token(Token.Type.LEFT_BRACE,"[", tempPost);
+                case ']':
+                    tempPost--;
+                    return new Token(Token.Type.RIGHT_BRACE,"]", tempPost);
                 default:
                     throw new RuntimeException("Unexpected character: " + ch);
             }
@@ -556,7 +683,7 @@ public class Lexer {
         if (token == null ) { // Check if token type and value match the expected ones
             throw new ParseException("1 Expected token '" + value + "' but found '" + (token != null ? token.getValue() : "null") + "'", 0); // Assuming 0 as position
         }         else if (token.getType() != type ) { // Check if token type and value match the expected ones
-            throw new ParseException("2 Expected token '" + value + "' but found '" + (token != null ? token.getValue() : "null") + "'", 0); // Assuming 0 as position
+            throw new ParseException("2 Expected token '" + type + "' but found '" + (token != null ? token.getType() : "null") + "'", 0); // Assuming 0 as position
         }         else if (!token.getValue().equals(value)) { // Check if token type and value match the expected ones
             throw new ParseException("3 Expected token '" + value + "' but found '" + (token != null ? token.getValue() : "null") + "'", 0); // Assuming 0 as position
         }
