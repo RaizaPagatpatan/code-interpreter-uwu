@@ -225,8 +225,7 @@ public class Parser {
             lexer.consume(Token.Type.ASSIGN, "=");
 
             if (!found) {
-
-                throw new ParseException("LINE: " + currentLine + " Undeclared variable " + lexer.peek().getValue(), currentLine);
+                throw new ParseException("LINE: " + currentLine + " Undeclared variable " + newToken.getValue(), currentLine);
             }
         }
         // If identifier not found, throw ParseException

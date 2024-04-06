@@ -37,11 +37,11 @@ public class Interpreter {
 
         StringBuilder output = new StringBuilder();
         for (ExpressionNode expression : expressions) {
-            System.out.println("EXPRESSION " + expression);
+//            System.out.println("EXPRESSION " + expression);
             Object value = expression.evaluate(symbolTable);
             if (expression.getExpressionType() == ExpressionNode.ExpressionType.IDENTIFIER)
             {
-                System.out.println("VALUE " + symbolTable.get(value.toString()));
+//                System.out.println("VALUE " + symbolTable.get(value.toString()));
                 value = symbolTable.get(value.toString());
             }
 //
