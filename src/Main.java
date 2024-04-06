@@ -28,11 +28,11 @@ public class Main {
                 #casoplkdasj
                
             
-                FLOAT a, b;
-                a = 2.3423;
+                FLOAT a, b = 3.4
+                a = 2.34
                 #comment only
-                DISPLAY a;
-                DISPLAY b;
+                DISPLAY a
+                DISPLAY b
        
                 
                 

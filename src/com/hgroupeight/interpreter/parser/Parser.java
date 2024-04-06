@@ -23,7 +23,6 @@ public class Parser {
         lexer.consume(Token.Type.BEGIN_CODE, "BEGIN CODE");
 
 
-
         while (lexer.peek().getType() != Token.Type.END_CODE) {
             if (lexer.peek().getType() == Token.Type.INTEGER_LITERAL && lexer.peek().getValue().equals("INT")) {
                 variableDeclarations.addAll(parseVariableDeclarations("INT"));
@@ -32,7 +31,9 @@ public class Parser {
             } else if (lexer.peek().getType() == Token.Type.BOOLEAN_LITERAL && lexer.peek().getValue().equals("BOOL")) {
                 variableDeclarations.addAll(parseVariableDeclarations("BOOL"));
             } else if (lexer.peek().getType() == Token.Type.FLOAT_LITERAL && lexer.peek().getValue().equals("FLOAT")) {
+
                 variableDeclarations.addAll(parseVariableDeclarations("FLOAT"));
+
             }else {
                 statements.add(parseStatement());
             }
@@ -72,7 +73,7 @@ public class Parser {
 
         do {
             Token identifier = lexer.getNextToken();
-
+            System.out.println("IDENTIFIER " + identifier);
             // Check if there's an assignment
             if (lexer.peek().getType() == Token.Type.ASSIGN) {
                 lexer.consume(Token.Type.ASSIGN, "=");
@@ -206,7 +207,7 @@ public class Parser {
                 }
             }
             if (!found) {
-                throw new ParseException("LINE: " + ++lexer.line + " Undeclared variable " + lexer.peek().getValue(), lexer.line);
+                throw new ParseException("LINE: " + currentLine + " Undeclared variable " + lexer.peek().getValue(), currentLine);
             }
         }
         // If identifier not found, throw ParseException

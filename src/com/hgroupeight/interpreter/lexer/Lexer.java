@@ -190,7 +190,7 @@ public class Lexer {
                 type = Token.Type.BOOLEAN_LITERAL;
                 break;
             case "FLOAT":
-                type = Token.Type.FLOAT;
+                type = Token.Type.FLOAT_LITERAL;
                 break;
             case "BEGIN":
                 if (currentPos < code.length() && code.charAt(currentPos) == ' ' && currentPos + 4 < code.length() && code.substring(currentPos + 1, currentPos + 5).equals("CODE")) {
