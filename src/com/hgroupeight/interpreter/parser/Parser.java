@@ -73,14 +73,12 @@ public class Parser {
 
         do {
             Token identifier = lexer.getNextToken();
-            System.out.println("IDENTIFIER " + identifier);
             // Check if there's an assignment
             if (lexer.peek().getType() == Token.Type.ASSIGN) {
                 lexer.consume(Token.Type.ASSIGN, "=");
                 Object value = lexer.peek().getValue();
-                System.out.println("TOKEN " + lexer.peek().getValue());
-                ExpressionNode expression = parseExpression();
 
+                ExpressionNode expression = parseExpression();
                 declarations.add(new VariableNode(identifier.getValue(), dataType, expression, value));
             } else {
                 // No assignment, add the variable declaration without expression
@@ -185,36 +183,71 @@ public class Parser {
 
         if (lexer.peek().getType() == Token.Type.DISPLAY) {
             return parseDisplayStatement();
-        } else {
-            return parseAssignmentStatement();
         }
+//        else {
+//            return parseAssignmentStatement();
+//        }
+        parseAssignmentStatement();
+        System.out.println("STATEMENTS " + statements);
+        return null;
     }
 
-    private AssignmentNode parseAssignmentStatement() throws ParseException {
+    private void parseAssignmentStatement() throws ParseException {
+        ArrayList<String> varNames = new ArrayList<String>();
         Token identifier = lexer.getNextToken();
+//        System.out.println("IDENTIFIER TOKEN " + identifier);
+        //adds first variable to varNames
+        varNames.add(identifier.getValue());
+
 
         lexer.consume(Token.Type.ASSIGN, "=");
-        System.out.println("LEXER PEEK " + lexer.peek().getValue());
-        System.out.println("LEXER PEEK " + lexer.peek().getType());
-        if (lexer.peek().getType() == Token.Type.IDENTIFIER) {
+//        System.out.println("LEXER PEEK " + lexer.peek().getValue());
+//        System.out.println("LEXER PEEK " + lexer.peek().getType());
+
+        while (lexer.peek().getType() == Token.Type.IDENTIFIER) {
             boolean found = false;
+            Token newToken = lexer.getNextToken();
+//            System.out.println("NEW TOKEN " + newToken);
+            if (newToken.getType() != Token.Type.IDENTIFIER) {
+                System.out.println("BREAK");
+                break;
+            }
+            //find if future var is Defined
             for (VariableNode varNode : variableDeclarations) {
 
-                System.out.println("VAR NAME " + varNode.getName() + "LEXER VALUE " + lexer.peek().getValue());
-                if (varNode.getName().equals(lexer.peek().getValue())) {
+//                System.out.println("VAR NAME " + varNode.getName() + " LEXER VALUE " + newToken.getValue());
+                if (varNode.getName().equals(newToken.getValue())) {
+                    varNames.add(varNode.getName());
                     found = true;
                     break;
                 }
             }
+            lexer.consume(Token.Type.ASSIGN, "=");
+
             if (!found) {
+
                 throw new ParseException("LINE: " + currentLine + " Undeclared variable " + lexer.peek().getValue(), currentLine);
             }
         }
         // If identifier not found, throw ParseException
-
+        System.out.println("GET CURRENT VALUE " + lexer.peek());
+        Object currentVal = lexer.peek().getValue();
         ExpressionNode expression = parseExpression();
+        System.out.println("EXPRESSION NODE " + expression);
+        for (String varName : varNames) {
+            for (VariableNode varNode : variableDeclarations) {
+
+//                System.out.println("VAR NAME " + varNode.getName() + " LEXER VALUE " + newToken.getValue());
+                if (varNode.getName().equals(varName)) {
+                    System.out.println("VAR NAME " + varNode.getName() + " VAR VALUE " + varName + "CURRENT VAL " + currentVal);
+                    varNode.setValue(currentVal);
+                    break;
+                }
+            }
+        }
 //        lexer.consume(Token.Type.LINE_BREAK, "\n");
-        return new AssignmentNode(identifier.getValue(), expression);
+        return;
+//        return new AssignmentNode(identifier.getValue(), expression);
     }
 
     private DisplayNode parseDisplayStatement() throws ParseException {
