@@ -27,18 +27,11 @@ public class Main {
                 
                 #casoplkdasj
                
-                INT zxc, cv = 3
-                FLOAT a, b,c,d
-                a = b = d =2.4
-                c = 3.23123
-                #comment only
-                DISPLAY a
-                DISPLAY b
-                DISPLAY c
-                DISPLAY zxc
-                DISPLAY cv
+                INT a = 1, b = 2, x
+                #x = a + b
                 
-                DISPLAY a & cv
+                
+                DISPLAY a & [#] & b
        
                 
                 

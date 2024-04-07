@@ -43,6 +43,34 @@ public class Lexer {
             }
             ch = code.charAt(currentPos);
         }
+        // NEWLINE uwu
+        if (ch == '$'){
+            currentPos++;
+            return new Token(Token.Type.NEWLINE, "$", currentPos - 1);
+        }
+
+        //ESCAPE CHARA
+        if (ch == '[') {
+            StringBuilder charLiteralBuilder = new StringBuilder();
+            char nextChar = code.charAt(currentPos + 1);
+
+            if (currentPos + 1 < code.length() && isValidEscapeChar(nextChar)) { // I should add a validation if considered as escape character ni siya ... probably add a method?
+                charLiteralBuilder.append(nextChar);
+                currentPos++;
+
+                if (currentPos + 1 < code.length() && code.charAt(currentPos + 1) == ']') {
+                    String charLiteral = charLiteralBuilder.toString();
+                    currentPos += 2;
+                    return new Token(Token.Type.CHAR_LITERAL, charLiteral, currentPos);
+                } else {
+                    throw new RuntimeException("Unclosed or invalid character literal starting at position " + currentPos);
+                }
+            } else {
+                throw new RuntimeException("Invalid character following '[' at position " + (currentPos + 1));
+            }
+        }
+
+
 
         // COMMENTS
         if (ch == '#') {
@@ -62,6 +90,7 @@ public class Lexer {
             return handleCharLiteral();
         }
         else if (Character.isAlphabetic(ch) || ch == '_') {
+
             return handleIdentifierOrKeyword();
         }
         // Number literals

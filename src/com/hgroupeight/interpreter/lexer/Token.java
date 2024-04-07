@@ -60,6 +60,7 @@ public class Token {
         NEWLINE,
         LEFT_BRACE, RIGHT_BRACE, // Escape Code
         COMMA, COLON, // for Variable Declaration and Statement Declaration
+        SCAN,
         // Assignment Operator -> '='
         ASSIGN,
 
@@ -107,7 +108,7 @@ public class Token {
 
         PRINT,
         BOOLEAN,
-        SCAN,
+
         COMMENT,
 
         NUM,
