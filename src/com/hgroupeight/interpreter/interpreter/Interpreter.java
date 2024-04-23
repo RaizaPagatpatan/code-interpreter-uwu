@@ -47,6 +47,7 @@ public class Interpreter {
 //
             output.append(value);
         }
+        System.out.println("OUTPUT:\n");
         System.out.println(output.toString());
     }
 
