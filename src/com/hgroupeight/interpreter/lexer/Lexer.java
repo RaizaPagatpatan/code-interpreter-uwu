@@ -61,7 +61,7 @@ public class Lexer {
         else if (ch == '\'') {
             return handleCharLiteral();
         }
-        else if (Character.isAlphabetic(ch) || ch == '_') {
+        else if (Character.isAlphabetic(ch)  || ch == '_') {
             return handleIdentifierOrKeyword();
         }
         // Number literals
@@ -134,6 +134,9 @@ public class Lexer {
                 case ';':
                     currentPos++;
                     return new Token(Token.Type.SEMICOLON,";", currentPos);
+                case ':':
+                    currentPos++;
+                    return new Token(Token.Type.COLON,":", currentPos);
                 case '$':
                     currentPos++;
                     return new Token(Token.Type.DOLLAR,"$", currentPos);
@@ -208,6 +211,9 @@ public class Lexer {
                 break;
             case "IF":
                 type = Token.Type.IF;
+                break;
+            case "SCAN":
+                type = Token.Type.SCAN;
                 break;
             case "ELSE":
                 if (currentPos < code.length() && code.charAt(currentPos) == ' ' && currentPos + 2 < code.length() && code.substring(currentPos + 1, currentPos + 3).equals("IF")) {

@@ -3,6 +3,7 @@ package com.hgroupeight.interpreter.parser;
 import com.hgroupeight.interpreter.ast.*;
 import com.hgroupeight.interpreter.lexer.Lexer;
 import com.hgroupeight.interpreter.lexer.Token;
+import com.sun.tools.jconsole.JConsoleContext;
 
 import javax.xml.crypto.Data;
 import java.text.ParseException;
@@ -34,7 +35,11 @@ public class Parser {
 
                 variableDeclarations.addAll(parseVariableDeclarations("FLOAT"));
 
-            }else {
+            } else if (lexer.peek().getType() == Token.Type.SCAN) {
+//                System.out.println("PARSE SCAN");
+                parseScanStatement();
+            }
+            else {
                 statements.add(parseStatement());
             }
         }
@@ -96,7 +101,8 @@ public class Parser {
         return declarations;
     }
 
-    private StatementNode parseScanStatement(List<VariableNode> variableDeclarations) throws ParseException {
+    private void parseScanStatement() throws ParseException {
+        System.out.println("PARSE SCAN");
         lexer.consume(Token.Type.SCAN, "SCAN");
         lexer.consume(Token.Type.COLON, ":");
 
@@ -108,7 +114,9 @@ public class Parser {
 
         do {
             Token identifierToken = lexer.getNextToken();
+            System.out.println("WHAT TOKEN " + identifierToken);
             String identifier = identifierToken.getValue();
+            System.out.println("IDENTIFIER " + identifier);
 
             // Find the variable declaration with the given identifier
             VariableNode variableNode = null;
@@ -161,13 +169,6 @@ public class Parser {
             }
         } while (true);
 
-
-        Token nextToken = lexer.peek();
-        if (nextToken.getType() != Token.Type.END_CODE && nextToken.getType() != Token.Type.DISPLAY) {
-            throw new ParseException("Unexpected statement after SCAN.", lexer.getCurrentPos());
-        }
-
-        return null;
     }
 
 
