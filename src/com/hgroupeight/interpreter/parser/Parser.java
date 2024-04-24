@@ -32,19 +32,21 @@
                 } else if (lexer.peek().getType() == Token.Type.BOOLEAN_LITERAL && lexer.peek().getValue().equals("BOOL")) {
                     variableDeclarations.addAll(parseVariableDeclarations("BOOL"));
                 } else if (lexer.peek().getType() == Token.Type.FLOAT_LITERAL && lexer.peek().getValue().equals("FLOAT")) {
-
                     variableDeclarations.addAll(parseVariableDeclarations("FLOAT"));
-
                 } else if (lexer.peek().getType() == Token.Type.SCAN) {
-    //                System.out.println("PARSE SCAN");
                     parseScanStatement();
-                }
-                else {
+                } else if (lexer.peek().getType() == Token.Type.BEGIN_CODE) {
+                    throw new ParseException("There must only be one BEGIN CODE and END CODE clause.", currentLine);
+                } else {
                     statements.add(parseStatement());
                 }
             }
            // Print the variables
             lexer.consume(Token.Type.END_CODE, "END CODE");
+
+            if (lexer.peek().getType() == Token.Type.BEGIN_CODE || lexer.peek().getType() == Token.Type.END_CODE) {
+                throw new ParseException("There must only be one BEGIN CODE and END CODE clause.", currentLine);
+            }
 
             return new ProgramNode(variableDeclarations, statements);
         }

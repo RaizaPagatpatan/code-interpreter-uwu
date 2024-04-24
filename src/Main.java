@@ -24,9 +24,6 @@ public class Main {
         String code =
                 """
                 BEGIN CODE
-
-                DISPLAY: a & [#] & " " & b
-                
                 END CODE
                 """;
 
