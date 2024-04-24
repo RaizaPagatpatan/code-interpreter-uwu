@@ -25,8 +25,10 @@ public class Main {
                 """
                 BEGIN CODE
                 
-                INT x = 1
-                DISPLAY: x
+                BOOL h = "FALSE"
+                #INT h = 1
+                #BOOL hello = FALSE
+                DISPLAY: h
                 
                 END CODE
                 """;

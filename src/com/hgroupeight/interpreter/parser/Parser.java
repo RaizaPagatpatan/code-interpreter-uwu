@@ -25,21 +25,22 @@ public class Parser {
 
 
         while (lexer.peek().getType() != Token.Type.END_CODE) {
+            System.out.println("What is this? " + lexer.peek());
             if (lexer.peek().getType() == Token.Type.INTEGER_LITERAL && lexer.peek().getValue().equals("INT")) {
                 variableDeclarations.addAll(parseVariableDeclarations("INT"));
             } else if (lexer.peek().getType() == Token.Type.CHAR_LITERAL && lexer.peek().getValue().equals("CHAR")) {
                 variableDeclarations.addAll(parseVariableDeclarations("CHAR"));
             } else if (lexer.peek().getType() == Token.Type.BOOLEAN_LITERAL && lexer.peek().getValue().equals("BOOL")) {
+                System.out.println("Why aren't we here?" + lexer.peek().getType());
                 variableDeclarations.addAll(parseVariableDeclarations("BOOL"));
             } else if (lexer.peek().getType() == Token.Type.FLOAT_LITERAL && lexer.peek().getValue().equals("FLOAT")) {
-
                 variableDeclarations.addAll(parseVariableDeclarations("FLOAT"));
-
             } else if (lexer.peek().getType() == Token.Type.SCAN) {
-//                System.out.println("PARSE SCAN");
                 parseScanStatement();
-            }
-            else {
+            }  else if (lexer.peek().getType() == Token.Type.DISPLAY) {
+                parseDisplayStatement();
+            } else {
+                System.out.println("Why ARE we here? " + lexer.peek().getType());
                 statements.add(parseStatement());
             }
         }
@@ -82,8 +83,10 @@ public class Parser {
             if (lexer.peek().getType() == Token.Type.ASSIGN) {
                 lexer.consume(Token.Type.ASSIGN, "=");
                 Object value = lexer.peek().getValue();
-
+                System.out.println("INSIDE DO-WHILE LOOP; CHECK " + identifier + " " + lexer.peek()) ;
                 ExpressionNode expression = parseExpression();
+                System.out.println("Is there where it all goes wrong?");
+                System.out.println("Is there where it all goes wrong?" + identifier.getValue()+ dataType + expression + value);
                 declarations.add(new VariableNode(identifier.getValue(), dataType, expression, value));
             } else {
                 // No assignment, add the variable declaration without expression
@@ -200,7 +203,7 @@ public class Parser {
         //adds first variable to varNames
         varNames.add(identifier.getValue());
 
-
+//        The problem is here...
         lexer.consume(Token.Type.ASSIGN, "=");
 
 //        System.out.println("LEXER PEEK " + lexer.peek().getValue());
@@ -216,7 +219,6 @@ public class Parser {
             }
             //find if future var is Defined
             for (VariableNode varNode : variableDeclarations) {
-
 //                System.out.println("VAR NAME " + varNode.getName() + " LEXER VALUE " + newToken.getValue());
                 if (varNode.getName().equals(newToken.getValue())) {
                     varNames.add(varNode.getName());
@@ -334,6 +336,10 @@ public class Parser {
             case CHAR_LITERAL:
                 expressionType = ExpressionNode.ExpressionType.CHARACTER;
                 break;
+            case BOOLEAN_LITERAL:
+                expressionType = ExpressionNode.ExpressionType.BOOLEAN;
+                System.out.println("parseLiteralExpression ok " + token);
+                break;
             case STRING_LITERAL:
                 expressionType = ExpressionNode.ExpressionType.STRING;
                 break;
@@ -361,6 +367,17 @@ public class Parser {
         }
     }
 
+    private ExpressionNode parseBoolExpression() throws ParseException {
+        Token token = lexer.getNextToken();
+        switch (token.getValue()) {
+            case "TRUE":
+            case "FALSE":
+                return new LiteralNode(ExpressionNode.ExpressionType.BOOLEAN, token.getValue());
+            default:
+                throw new ParseException("Invalid bool expression: " + token.getValue(), lexer.peek().getPosition());
+        }
+    }
+
     private ExpressionNode parseKeywordExpression() throws ParseException {
         Token token = lexer.getNextToken();
         switch (token.getValue()) {
@@ -380,11 +397,17 @@ public class Parser {
         System.out.println("CHECK " + currentToken.getType());
         System.out.println("IDENTIFIER DISPLAY " + currentToken);
         switch (currentToken.getType()) {
+            case TRUE:
+                return new LiteralNode(ExpressionNode.ExpressionType.BOOLEAN, "TRUE");
+            case FALSE:
+                return new LiteralNode(ExpressionNode.ExpressionType.BOOLEAN, "FALSE");
             case INTEGER_LITERAL:
             case CHAR_LITERAL:
             case STRING_LITERAL:
             case IDENTIFIER:
             case FLOAT_LITERAL:
+            case BOOLEAN_LITERAL:
+                System.out.println("parseExpression ok");
                 return parseLiteralExpression();
             case KEYWORD:
                 return parseKeywordExpression();
@@ -395,7 +418,7 @@ public class Parser {
             case LEFT_PAREN:
                 return parseArithmeticExpression(); // arithmetics parsing call
             default:
-                throw new ParseException("Unexpected token: " + currentToken.getValue(), lexer.peek().getPosition());
+                throw new ParseException("? Unexpected token: " + currentToken.getValue(), lexer.peek().getPosition());
         }
     }
 

@@ -82,8 +82,20 @@ public class Lexer {
 
         // Handle other token types
         // Identifiers and keywords
+        // Handle boolean
         // String literals
         if (ch == '"') {
+            // Check if "" is boolean value ("TRUE" or "FALSE")
+            if (currentPos + 1 < code.length()) {
+                if ((code).startsWith("\"FALSE\"", currentPos)) {
+                    return new Token(Token.Type.BOOLEAN_LITERAL, "FALSE", currentPos);
+                } else if ((code).startsWith("\"TRUE\"", currentPos)) {
+                    return new Token(Token.Type.BOOLEAN_LITERAL, "TRUE", currentPos);
+                }
+                System.out.println("This works!");
+            }
+
+            // Return string if not boolean
             return handleStringLiteral();
         }
         else if (Character.isAlphabetic(ch) || ch == '_') {
