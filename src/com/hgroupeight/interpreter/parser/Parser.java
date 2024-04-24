@@ -197,6 +197,7 @@ public class Parser {
         ArrayList<String> varNames = new ArrayList<String>();
         Token identifier = lexer.getNextToken();
 //        System.out.println("IDENTIFIER TOKEN " + identifier);
+
         //adds first variable to varNames
         varNames.add(identifier.getValue());
 
