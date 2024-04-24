@@ -84,7 +84,13 @@ public class Lexer {
         // Identifiers and keywords
         // String literals
         if (ch == '"') {
-            return handleStringLiteral();
+            // Check if the string is a boolean literal
+            Token booleanToken = handleBooleanLiteral();
+            if (booleanToken != null) {
+                return booleanToken;
+            } else {
+                return handleStringLiteral();
+            }
         }
         else if (Character.isAlphabetic(ch) || ch == '_') {
             return handleIdentifierOrKeyword();
@@ -318,6 +324,28 @@ public class Lexer {
         return new Token(Token.Type.STRING_LITERAL, value.toString(), tokenStartPos);
     }
 
+    private Token handleBooleanLiteral() {
+        int tokenStartPos = currentPos;
+        StringBuilder value = new StringBuilder();
+ // Append the opening double quote
+        currentPos++;
+        // Append subsequent characters until the closing double quote is encountered
+        while (currentPos < code.length() && code.charAt(currentPos) != '"') {
+            value.append(code.charAt(currentPos));
+            currentPos++;
+        }
+        // Check if the value is a valid boolean literal
+        if (value.toString().equals("TRUE") || value.toString().equals("FALSE")) {
+
+            // Move past the closing double quote
+            currentPos++;
+            return new Token(Token.Type.BOOLEAN_LITERAL, value.toString(), tokenStartPos);
+        } else {
+            // Reset the position to the start of the potential string literal
+            currentPos = tokenStartPos;
+            return null; // Not a boolean literal
+        }
+    }
     public void consume(Token.Type type, String value) throws ParseException {
         Token token = getNextToken();
         if (token == null) { // Check if token type and value match the expected ones
