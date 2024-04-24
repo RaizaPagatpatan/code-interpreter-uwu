@@ -25,15 +25,8 @@ public class Main {
                 """
                 BEGIN CODE
                 
-                #casoplkdasj
-               
-                INT a = 1, b = 2, x
-                #x = a + b
-                
-                
-                DISPLAY a & [#] & b
-       
-                
+                INT x = 1
+                DISPLAY: x
                 
                 END CODE
                 """;

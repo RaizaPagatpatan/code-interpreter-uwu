@@ -11,7 +11,7 @@ Please take note of the features to be checked for Increment 2.
 DONE - concatenation (&)
 Can read now, In Progress - next line ($)
 DONE - escape code ([])
-In Progress (single variable only) - SCAN function
+DONE - SCAN function
 In Progress - arithmetic operation
 
 
