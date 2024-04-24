@@ -440,6 +440,7 @@ import com.sun.tools.jconsole.JConsoleContext;
         switch (currentToken.getType()) {
             case INTEGER_LITERAL:
             case CHAR_LITERAL:
+            case BOOLEAN_LITERAL:
             case STRING_LITERAL:
             case IDENTIFIER:
             case FLOAT_LITERAL:

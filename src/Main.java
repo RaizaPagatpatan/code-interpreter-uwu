@@ -25,7 +25,9 @@ public class Main {
                 """
                 BEGIN CODE
                 
-                #casoplkdasj
+               #casoplkdasj
+               BOOL h = FALSE
+                
                INT b = 2, a = 3
                INT x
                x = b + 10
