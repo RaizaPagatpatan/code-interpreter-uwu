@@ -84,10 +84,13 @@ public class Lexer {
         // Identifiers and keywords
         // String literals
         if (ch == '"') {
-            return handleStringLiteral();
-        }
-        else if (ch == '\'') {
-            return handleCharLiteral();
+            // Check if the string is a boolean literal
+            Token booleanToken = handleBooleanLiteral();
+            if (booleanToken != null) {
+                return booleanToken;
+            } else {
+                return handleStringLiteral();
+            }
         }
         else if (Character.isAlphabetic(ch) || ch == '_') {
             return handleIdentifierOrKeyword();
@@ -97,6 +100,13 @@ public class Lexer {
             return handleNumberLiteral();
         }
         // Character literals
+        else if (ch == '\'') {
+            return handleCharLiteral();
+        }
+        else if (ch == ':') {
+            currentPos++;
+            return new Token(Token.Type.COLON, ":", currentPos);
+        }
         else {
             // OPERATORS
             switch (ch) {
@@ -122,6 +132,7 @@ public class Lexer {
                     currentPos++;
                     return new Token(Token.Type.RIGHT_PAREN,")", currentPos);
                 case '=':
+                    System.out.println("CHAR AT " + code.charAt(currentPos));
                     currentPos++;
                     if (currentPos < code.length() && code.charAt(currentPos) == '=') {
                         currentPos++;
@@ -154,9 +165,9 @@ public class Lexer {
                 case ',':
                     currentPos++;
                     return new Token(Token.Type.COMMA,",", currentPos);
-                case ';':
+                case '\n': // Treat line breaks as token separators
                     currentPos++;
-                    return new Token(Token.Type.SEMICOLON,";", currentPos);
+                    return new Token(Token.Type.LINE_BREAK, "\n", currentPos);
                 case ':':
                     currentPos++;
                     return new Token(Token.Type.COLON,":", currentPos);
@@ -183,7 +194,7 @@ public class Lexer {
             currentPos++;
         }
         String identifier = text.toString(); // Convert to upper case for case-insensitive comparison
-        Token.Type type;
+        Token.Type type = null;
 
         // Check if the identifier is "INT"
 //        if (identifier.equals("INT")) {
@@ -198,7 +209,11 @@ public class Lexer {
                 type = Token.Type.AND;
                 break;
             case "DISPLAY":
-                type = Token.Type.DISPLAY;
+//                type = Token.Type.DISPLAY;
+                if (currentPos < code.length() && code.charAt(currentPos) == ':') {
+                    currentPos++;
+                    type = Token.Type.DISPLAY;
+                }
                 break;
             case "OR":
                 type = Token.Type.OR;
@@ -309,6 +324,28 @@ public class Lexer {
         return new Token(Token.Type.STRING_LITERAL, value.toString(), tokenStartPos);
     }
 
+    private Token handleBooleanLiteral() {
+        int tokenStartPos = currentPos;
+        StringBuilder value = new StringBuilder();
+ // Append the opening double quote
+        currentPos++;
+        // Append subsequent characters until the closing double quote is encountered
+        while (currentPos < code.length() && code.charAt(currentPos) != '"') {
+            value.append(code.charAt(currentPos));
+            currentPos++;
+        }
+        // Check if the value is a valid boolean literal
+        if (value.toString().equals("TRUE") || value.toString().equals("FALSE")) {
+
+            // Move past the closing double quote
+            currentPos++;
+            return new Token(Token.Type.BOOLEAN_LITERAL, value.toString(), tokenStartPos);
+        } else {
+            // Reset the position to the start of the potential string literal
+            currentPos = tokenStartPos;
+            return null; // Not a boolean literal
+        }
+    }
     public void consume(Token.Type type, String value) throws ParseException {
         Token token = getNextToken();
         if (token == null) { // Check if token type and value match the expected ones
