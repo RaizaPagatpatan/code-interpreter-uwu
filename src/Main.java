@@ -25,16 +25,12 @@ public class Main {
                 """
                 BEGIN CODE
                 
-                #casoplkdasj
+                INT sum = 64, s = 5
+                sum = sum + s
+                
+                DISPLAY sum
                
-                INT a = 1, b = 2, x
-                #x = a + b
-                
-                
-                DISPLAY a & [#] & b
-       
-                
-                
+                     
                 END CODE
                 """;
 

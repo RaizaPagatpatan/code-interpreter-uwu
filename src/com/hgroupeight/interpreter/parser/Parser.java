@@ -3,6 +3,7 @@ package com.hgroupeight.interpreter.parser;
 import com.hgroupeight.interpreter.ast.*;
 import com.hgroupeight.interpreter.lexer.Lexer;
 import com.hgroupeight.interpreter.lexer.Token;
+import com.hgroupeight.interpreter.symboltable.SymbolTable;
 import com.sun.tools.jconsole.JConsoleContext;
 
 import javax.xml.crypto.Data;
@@ -195,9 +196,13 @@ public class Parser {
 
     private void parseAssignmentStatement() throws ParseException {
         ArrayList<String> varNames = new ArrayList<String>();
+//        SymbolTable symb = new SymbolTable();
+
+
         Token identifier = lexer.getNextToken();
 //        System.out.println("IDENTIFIER TOKEN " + identifier);
         //adds first variable to varNames
+//        symb.addVariable(identifier.getValue(), );
         varNames.add(identifier.getValue());
 
 
@@ -216,7 +221,6 @@ public class Parser {
             }
             //find if future var is Defined
             for (VariableNode varNode : variableDeclarations) {
-
 //                System.out.println("VAR NAME " + varNode.getName() + " LEXER VALUE " + newToken.getValue());
                 if (varNode.getName().equals(newToken.getValue())) {
                     varNames.add(varNode.getName());
@@ -224,12 +228,68 @@ public class Parser {
                     break;
                 }
             }
-            lexer.consume(Token.Type.ASSIGN, "=");
+//            System.out.println("LEXER TOKEN " + lexer.peek().getType());
+//            else
+            if (Token.Type.PLUS == lexer.peek().getType())
+            {
+                int leftvalue = 0; // Initialize to default value
+                int rightvalue = 0; // Initialize to default value
+                lexer.consume(Token.Type.PLUS, "+");
+                System.out.println("ASDASD");
+                System.out.println("LAST " + varNames.get(varNames.size()-1));
+
+                if (lexer.peek().getType() != Token.Type.IDENTIFIER && lexer.peek().getType() != Token.Type.INTEGER_LITERAL) {
+                    System.out.println("ERROR NEEDS IDENTIFIER BUT FOUND " + lexer.peek().getType());
+                    return;
+                }
+
+                if ( lexer.peek().getType() == Token.Type.INTEGER_LITERAL) {
+                    System.out.println("ITS AN INT");
+                    rightvalue = Integer.parseInt((String) lexer.peek().getValue());
+//                    lexer.getNextToken();
+                    lexer.consume(Token.Type.INTEGER_LITERAL, lexer.peek().getValue());
+                }
+                // ASSIGN THE LEFT AND RIGHT VALUES
+                for (VariableNode var : variableDeclarations) {
+                    if (var.getName().equals(varNames.get(varNames.size()-1))) {
+                        leftvalue = Integer.parseInt((String) var.getValue());
+                        System.out.println("LEFT VALUE " + leftvalue);
+                    }
+
+                    if (var.getName().equals(lexer.peek().getValue())) {
+                        rightvalue = Integer.parseInt((String) var.getValue());
+                    }
+                }
+
+                for (VariableNode var : variableDeclarations) {
+                    if (var.getName().equals(varNames.get(0))) {
+                        System.out.println("SAW ASSIGN - - - - -- - - - - - - -");
+                        var.setValue(leftvalue + rightvalue); // No need to cast here, as they're already int
+                    }
+                }
+
+
+
+
+
+                System.out.println("IDENTIFIER CHECK " + lexer.peek().getType() + " VAR NAME " + lexer.peek().getValue() );
+            }
+            else if (Token.Type.DISPLAY == lexer.peek().getType()) {
+                System.out.println("VAR NAMES " + varNames.get(0));
+                return;
+            }
+            else
+                lexer.consume(Token.Type.ASSIGN, "=");
 
             if (!found) {
                 throw new ParseException("LINE: " + currentLine + " Undeclared variable " + newToken.getValue(), currentLine);
             }
         }
+
+        if (lexer.peek().getType() == Token.Type.DISPLAY) {
+            return;
+        }
+
         // If identifier not found, throw ParseException
         System.out.println("GET CURRENT VALUE " + lexer.peek());
         Object currentVal = lexer.peek().getValue();
@@ -377,8 +437,8 @@ public class Parser {
 
     private ExpressionNode parseExpression() throws ParseException {
         Token currentToken = lexer.peek();
-        System.out.println("CHECK " + currentToken.getType());
-        System.out.println("IDENTIFIER DISPLAY " + currentToken);
+//        System.out.println("CHECK " + currentToken.getType());
+//        System.out.println("IDENTIFIER DISPLAY " + currentToken);
         switch (currentToken.getType()) {
             case INTEGER_LITERAL:
             case CHAR_LITERAL:
