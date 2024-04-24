@@ -25,10 +25,21 @@ public class Main {
                 """
                 BEGIN CODE
                 
-                BOOL h = "FALSE"
-                #INT h = 1
-                #BOOL hello = FALSE
-                DISPLAY: h
+               #casoplkdasj
+               BOOL h = FALSE
+                
+               INT b = 2, a = 3
+               INT x
+               x = b + 10
+               DISPLAY: x
+               DISPLAY: h
+               #INT a = 1, b = 2, x
+                #x = a + b
+                
+                
+                #DISPLAY a & [#] & b 
+       
+                
                 
                 END CODE
                 """;

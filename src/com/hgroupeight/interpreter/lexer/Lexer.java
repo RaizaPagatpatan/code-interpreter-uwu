@@ -82,21 +82,15 @@ public class Lexer {
 
         // Handle other token types
         // Identifiers and keywords
-        // Handle boolean
         // String literals
         if (ch == '"') {
-            // Check if "" is boolean value ("TRUE" or "FALSE")
-            if (currentPos + 1 < code.length()) {
-                if ((code).startsWith("\"FALSE\"", currentPos)) {
-                    return new Token(Token.Type.BOOLEAN_LITERAL, "FALSE", currentPos);
-                } else if ((code).startsWith("\"TRUE\"", currentPos)) {
-                    return new Token(Token.Type.BOOLEAN_LITERAL, "TRUE", currentPos);
-                }
-                System.out.println("This works!");
+            // Check if the string is a boolean literal
+            Token booleanToken = handleBooleanLiteral();
+            if (booleanToken != null) {
+                return booleanToken;
+            } else {
+                return handleStringLiteral();
             }
-
-            // Return string if not boolean
-            return handleStringLiteral();
         }
         else if (Character.isAlphabetic(ch) || ch == '_') {
             return handleIdentifierOrKeyword();
@@ -138,7 +132,7 @@ public class Lexer {
                     currentPos++;
                     return new Token(Token.Type.RIGHT_PAREN,")", currentPos);
                 case '=':
-                    System.out.println("CHAR AT " + code.charAt(currentPos));
+//                    System.out.println("CHAR AT " + code.charAt(currentPos));
                     currentPos++;
                     if (currentPos < code.length() && code.charAt(currentPos) == '=') {
                         currentPos++;
@@ -330,6 +324,28 @@ public class Lexer {
         return new Token(Token.Type.STRING_LITERAL, value.toString(), tokenStartPos);
     }
 
+    private Token handleBooleanLiteral() {
+        int tokenStartPos = currentPos;
+        StringBuilder value = new StringBuilder();
+ // Append the opening double quote
+        currentPos++;
+        // Append subsequent characters until the closing double quote is encountered
+        while (currentPos < code.length() && code.charAt(currentPos) != '"') {
+            value.append(code.charAt(currentPos));
+            currentPos++;
+        }
+        // Check if the value is a valid boolean literal
+        if (value.toString().equals("TRUE") || value.toString().equals("FALSE")) {
+
+            // Move past the closing double quote
+            currentPos++;
+            return new Token(Token.Type.BOOLEAN_LITERAL, value.toString(), tokenStartPos);
+        } else {
+            // Reset the position to the start of the potential string literal
+            currentPos = tokenStartPos;
+            return null; // Not a boolean literal
+        }
+    }
     public void consume(Token.Type type, String value) throws ParseException {
         Token token = getNextToken();
         if (token == null) { // Check if token type and value match the expected ones
