@@ -26,12 +26,15 @@ public class Main {
                 BEGIN CODE
                 
                 #casoplkdasj
-               
-                INT a = 1, b = 2, x
+               INT b = 2, a = 3
+               INT x
+               x = b + 10
+               DISPLAY: x
+               #INT a = 1, b = 2, x
                 #x = a + b
                 
                 
-                DISPLAY a & [#] & b
+                #DISPLAY a & [#] & b 
        
                 
                 

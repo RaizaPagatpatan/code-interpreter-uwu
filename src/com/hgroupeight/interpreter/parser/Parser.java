@@ -203,15 +203,11 @@ import com.sun.tools.jconsole.JConsoleContext;
     private void parseAssignmentStatement() throws ParseException {
         ArrayList<String> varNames = new ArrayList<String>();
 //        SymbolTable symb = new SymbolTable();
-
-
         Token identifier = lexer.getNextToken();
 //        System.out.println("IDENTIFIER TOKEN " + identifier);
         //adds first variable to varNames
 //        symb.addVariable(identifier.getValue(), );
         varNames.add(identifier.getValue());
-
-
             lexer.consume(Token.Type.ASSIGN, "=");
 
     //        System.out.println("LEXER PEEK " + lexer.peek().getValue());
@@ -263,25 +259,23 @@ import com.sun.tools.jconsole.JConsoleContext;
                     }
 
                     if (var.getName().equals(lexer.peek().getValue())) {
+                        System.out.println("THE INT " + Integer.parseInt((String) var.getValue()));
                         rightvalue = Integer.parseInt((String) var.getValue());
                     }
                 }
 
                 for (VariableNode var : variableDeclarations) {
                     if (var.getName().equals(varNames.get(0))) {
-                        System.out.println("SAW ASSIGN - - - - -- - - - - - - -");
+                        System.out.println("SAW ASSIGN - - - - -- - - - - - - - " + var.getName());
                         var.setValue(leftvalue + rightvalue); // No need to cast here, as they're already int
                     }
                 }
-
-
-
-
 
                 System.out.println("IDENTIFIER CHECK " + lexer.peek().getType() + " VAR NAME " + lexer.peek().getValue() );
             }
             else if (Token.Type.DISPLAY == lexer.peek().getType()) {
                 System.out.println("VAR NAMES " + varNames.get(0));
+//                parseDisplayStatement();
                 return;
             }
             else
@@ -293,6 +287,7 @@ import com.sun.tools.jconsole.JConsoleContext;
         }
         // If identifier not found, throw ParseException
         System.out.println("GET CURRENT VALUE " + lexer.peek());
+        if (lexer.peek().getType() == Token.Type.DISPLAY) return;
         Object currentVal = lexer.peek().getValue();
         ExpressionNode expression = parseExpression();
         System.out.println("EXPRESSION NODE " + expression);
@@ -438,31 +433,6 @@ import com.sun.tools.jconsole.JConsoleContext;
 
 
         /// Parser for expression arithmetics
-
-        private ExpressionNode parseExpression() throws ParseException {
-            Token currentToken = lexer.peek();
-            System.out.println("CHECK " + currentToken.getType());
-            System.out.println("IDENTIFIER DISPLAY " + currentToken);
-            switch (currentToken.getType()) {
-                case INTEGER_LITERAL:
-                case CHAR_LITERAL:
-                case BOOLEAN_LITERAL:
-                case STRING_LITERAL:
-                case IDENTIFIER:
-                case FLOAT_LITERAL:
-                    return parseLiteralExpression();
-                case KEYWORD:
-                    return parseKeywordExpression();
-                case PLUS:
-                case MINUS:
-                case MULTIPLY:
-                case DIVIDE:
-                case LEFT_PAREN:
-                    return parseArithmeticExpression(); // arithmetics parsing call
-                default:
-                    throw new ParseException("Unexpected token: " + currentToken.getValue(), lexer.peek().getPosition());
-            }
-        }
     private ExpressionNode parseExpression() throws ParseException {
         Token currentToken = lexer.peek();
 //        System.out.println("CHECK " + currentToken.getType());
