@@ -196,12 +196,13 @@ public class Parser {
     private void parseAssignmentStatement() throws ParseException {
         ArrayList<String> varNames = new ArrayList<String>();
         Token identifier = lexer.getNextToken();
-//        System.out.println("IDENTIFIER TOKEN " + identifier);
+        System.out.println("IDENTIFIER TOKEN " + identifier);
         //adds first variable to varNames
         varNames.add(identifier.getValue());
 
 
         lexer.consume(Token.Type.ASSIGN, "=");
+
 //        System.out.println("LEXER PEEK " + lexer.peek().getValue());
 //        System.out.println("LEXER PEEK " + lexer.peek().getType());
 
@@ -272,25 +273,25 @@ public class Parser {
         return new DisplayNode(expressions);
     }
 
-    private ExpressionNode parseExpression() throws ParseException {
-        Token currentToken = lexer.peek();
-        System.out.println("CHECK " + currentToken.getType());
-        System.out.println("IDENTIFIER DISPLAY " + currentToken);
-        switch (currentToken.getType()) {
-            case INTEGER_LITERAL:
-            case CHAR_LITERAL:
-            case STRING_LITERAL:
-            case IDENTIFIER:
-            case FLOAT_LITERAL:
-                return parseLiteralExpression();
-            case KEYWORD:
-                return parseKeywordExpression();
-//            case CONCATENATE:
-//                return parseConcatExpression();
-            default:
-                throw new ParseException("Unexpected token: " + currentToken.getValue(), lexer.peek().getPosition());
-        }
-    }
+//    private ExpressionNode parseExpression() throws ParseException {
+//        Token currentToken = lexer.peek();
+//        System.out.println("CHECK " + currentToken.getType());
+//        System.out.println("IDENTIFIER DISPLAY " + currentToken);
+//        switch (currentToken.getType()) {
+//            case INTEGER_LITERAL:
+//            case CHAR_LITERAL:
+//            case STRING_LITERAL:
+//            case IDENTIFIER:
+//            case FLOAT_LITERAL:
+//                return parseLiteralExpression();
+//            case KEYWORD:
+//                return parseKeywordExpression();
+////            case CONCATENATE:
+////                return parseConcatExpression();
+//            default:
+//                throw new ParseException("Unexpected token: " + currentToken.getValue(), lexer.peek().getPosition());
+//        }
+//    }
 
 //    private ExpressionNode parseConcatExpression() throws ParseException {
 //        List<ExpressionNode> expressions = new ArrayList<>();
@@ -370,4 +371,83 @@ public class Parser {
                 throw new ParseException("Invalid keyword expression: " + token.getValue(), lexer.peek().getPosition());
         }
     }
+
+
+    /// Parser for expression arithmetics
+
+    private ExpressionNode parseExpression() throws ParseException {
+        Token currentToken = lexer.peek();
+        System.out.println("CHECK " + currentToken.getType());
+        System.out.println("IDENTIFIER DISPLAY " + currentToken);
+        switch (currentToken.getType()) {
+            case INTEGER_LITERAL:
+            case CHAR_LITERAL:
+            case STRING_LITERAL:
+            case IDENTIFIER:
+            case FLOAT_LITERAL:
+                return parseLiteralExpression();
+            case KEYWORD:
+                return parseKeywordExpression();
+            case PLUS:
+            case MINUS:
+            case MULTIPLY:
+            case DIVIDE:
+            case LEFT_PAREN:
+                return parseArithmeticExpression(); // arithmetics parsing call
+            default:
+                throw new ParseException("Unexpected token: " + currentToken.getValue(), lexer.peek().getPosition());
+        }
+    }
+
+    private ExpressionNode parseArithmeticExpression() throws ParseException {
+        // start on left
+        ExpressionNode leftOperand = parseTerm();
+
+        // parse optional operands a.k.a the lower order
+        while (lexer.peek().getType() == Token.Type.PLUS || lexer.peek().getType() == Token.Type.MINUS) {
+            Token operatorToken = lexer.getNextToken();
+            ExpressionNode rightOperand = parseTerm();
+            // Create a BinaryExpressionNode for the arithmetic operation
+            BinaryExpressionNode.BinaryOperator operator = operatorToken.getType() == Token.Type.PLUS ?
+                    BinaryExpressionNode.BinaryOperator.ADDITION : BinaryExpressionNode.BinaryOperator.SUBTRACTION;
+            leftOperand = new BinaryExpressionNode(leftOperand, rightOperand, operator);
+        }
+        return leftOperand;
+    }
+
+    // term x term , term, term / term
+    private ExpressionNode parseTerm() throws ParseException {
+        // parse left operand, check left first, check right , if optional, suspend.
+        ExpressionNode leftOperand = parseFactor();
+
+        // parse term x term, term / term
+        while (lexer.peek().getType() == Token.Type.MULTIPLY || lexer.peek().getType() == Token.Type.DIVIDE) {
+            Token operatorToken = lexer.getNextToken();
+            ExpressionNode rightOperand = parseFactor();
+            // binary node get
+            BinaryExpressionNode.BinaryOperator operator = operatorToken.getType() == Token.Type.MULTIPLY ?
+                    BinaryExpressionNode.BinaryOperator.MULTIPLICATION : BinaryExpressionNode.BinaryOperator.DIVISION;
+            leftOperand = new BinaryExpressionNode(leftOperand, rightOperand, operator);
+        }
+        return leftOperand;
+    }
+
+    private ExpressionNode parseFactor() throws ParseException {
+        Token currentToken = lexer.peek();
+        if (currentToken.getType() == Token.Type.INTEGER_LITERAL ||
+                currentToken.getType() == Token.Type.FLOAT_LITERAL ||
+                currentToken.getType() == Token.Type.IDENTIFIER) {
+            lexer.getNextToken(); // Consume the token
+            // literal node Integer get
+            return new LiteralNode(ExpressionNode.ExpressionType.INTEGER, currentToken.getValue());
+        } else if (currentToken.getType() == Token.Type.LEFT_PAREN) {
+            lexer.consume(Token.Type.LEFT_PAREN, "(");
+            ExpressionNode expression = parseArithmeticExpression();
+            lexer.consume(Token.Type.RIGHT_PAREN, ")");
+            return expression;
+        } else {
+            throw new ParseException("Unexpected token: " + currentToken.getValue(), lexer.peek().getPosition());
+        }
+    }
+
 }
