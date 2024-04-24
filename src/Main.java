@@ -58,6 +58,7 @@ public class Main {
             ProgramNode program = parser.parse();
             System.out.println("PROGRAM NODE" + program);
             // 4. AST
+            System.out.println("OUTPUT:\n");
             interpreter.interpret(program, symbolTable);
 //            System.out.println("Symbol Table " + symbolTable);
         } catch (ParseException e) {

@@ -34,7 +34,7 @@ public class Interpreter {
 
     private void interpretDisplay(DisplayNode displayNode, SymbolTable symbolTable) throws Exception {
         List<ExpressionNode> expressions = displayNode.getExpressions();
-
+//        System.out.println("OUTPUT:\n");
         StringBuilder output = new StringBuilder();
         for (ExpressionNode expression : expressions) {
 //            System.out.println("EXPRESSION " + expression);
@@ -47,7 +47,7 @@ public class Interpreter {
 //
             output.append(value);
         }
-        System.out.println("OUTPUT:\n");
+
         System.out.println(output.toString());
     }
 
