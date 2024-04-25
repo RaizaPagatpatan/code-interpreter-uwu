@@ -202,41 +202,80 @@ import com.sun.tools.jconsole.JConsoleContext;
 
     private void parseAssignmentStatement() throws ParseException {
         ArrayList<String> varNames = new ArrayList<String>();
+        int leftvalue = 0; // Initialize to default value
+        int rightvalue = 0; // Initialize to default value
+        boolean isLeftInt = false;
+        boolean isRightInt = false;
 //        SymbolTable symb = new SymbolTable();
         Token identifier = lexer.getNextToken();
 //        System.out.println("IDENTIFIER TOKEN " + identifier);
         //adds first variable to varNames
 //        symb.addVariable(identifier.getValue(), );
-        varNames.add(identifier.getValue());
-            lexer.consume(Token.Type.ASSIGN, "=");
+        if (identifier.getType() == Token.Type.IDENTIFIER) {
+            System.out.println("WENT IN HERE" + identifier.getType() + " " + identifier.getValue());
+            varNames.add(identifier.getValue());
+        }
+
+        lexer.consume(Token.Type.ASSIGN, "=");
 
     //        System.out.println("LEXER PEEK " + lexer.peek().getValue());
     //        System.out.println("LEXER PEEK " + lexer.peek().getType());
 
-        while (lexer.peek().getType() == Token.Type.IDENTIFIER) {
+
+        while (lexer.peek().getType() == Token.Type.IDENTIFIER || lexer.peek().getType() == Token.Type.INTEGER_LITERAL) {
+
+
+
             boolean found = false;
             Token newToken = lexer.getNextToken();
 //            System.out.println("NEW TOKEN " + newToken);
-            if (newToken.getType() != Token.Type.IDENTIFIER) {
+            if (newToken.getType() != Token.Type.IDENTIFIER && newToken.getType() != Token.Type.INTEGER_LITERAL ) {
+                System.out.println("NEW TYPE " + newToken.getType());
                 System.out.println("BREAK");
                 break;
+            }
+
+            if (newToken.getType() == Token.Type.INTEGER_LITERAL) {
+                System.out.println("ITS AN INT LEFT _____");
+                isLeftInt = true;
+                leftvalue = Integer.parseInt((String) newToken.getValue());
+//                    lexer.getNextToken();
+//                lexer.consume(Token.Type.INTEGER_LITERAL, lexer.peek().getValue());
             }
             //find if future var is Defined
             for (VariableNode varNode : variableDeclarations) {
 //                System.out.println("VAR NAME " + varNode.getName() + " LEXER VALUE " + newToken.getValue());
                 if (varNode.getName().equals(newToken.getValue())) {
+                    System.out.println("VAR NODEEE " + varNode.getName());
                     varNames.add(varNode.getName());
                     found = true;
                     break;
                 }
             }
+
+
 //            System.out.println("LEXER TOKEN " + lexer.peek().getType());
 //            else
-            if (Token.Type.PLUS == lexer.peek().getType())
+            if (Token.Type.PLUS == lexer.peek().getType() || Token.Type.MINUS == lexer.peek().getType() || Token.Type.MULTIPLY == lexer.peek().getType() || Token.Type.DIVIDE == lexer.peek().getType())
             {
-                int leftvalue = 0; // Initialize to default value
-                int rightvalue = 0; // Initialize to default value
-                lexer.consume(Token.Type.PLUS, "+");
+                String binOperation = "";
+                if (Token.Type.PLUS == lexer.peek().getType()) {
+                    binOperation = "PLUS";
+                    lexer.consume(Token.Type.PLUS, "+");
+                }
+                else if (Token.Type.MINUS == lexer.peek().getType()) {
+                    binOperation = "MINUS";
+                    lexer.consume(Token.Type.MINUS, "-");
+                }
+                else if (Token.Type.MULTIPLY == lexer.peek().getType()) {
+                    binOperation = "MULTIPLY";
+                    lexer.consume(Token.Type.MULTIPLY, "*");
+                }
+                else if (Token.Type.DIVIDE == lexer.peek().getType()) {
+                    binOperation = "DIVIDE";
+                    lexer.consume(Token.Type.DIVIDE, "/");
+                }
+
                 System.out.println("ASDASD");
                 System.out.println("LAST " + varNames.get(varNames.size()-1));
 
@@ -246,14 +285,14 @@ import com.sun.tools.jconsole.JConsoleContext;
                 }
 
                 if ( lexer.peek().getType() == Token.Type.INTEGER_LITERAL) {
-                    System.out.println("ITS AN INT");
+                    System.out.println("ITS AN INT RIGHTTTTTTTT");
                     rightvalue = Integer.parseInt((String) lexer.peek().getValue());
 //                    lexer.getNextToken();
                     lexer.consume(Token.Type.INTEGER_LITERAL, lexer.peek().getValue());
                 }
                 // ASSIGN THE LEFT AND RIGHT VALUES
                 for (VariableNode var : variableDeclarations) {
-                    if (var.getName().equals(varNames.get(varNames.size()-1))) {
+                    if (var.getName().equals(varNames.get(varNames.size()-1)) && !isLeftInt) {
                         leftvalue = Integer.parseInt((String) var.getValue());
                         System.out.println("LEFT VALUE " + leftvalue);
                     }
@@ -267,11 +306,24 @@ import com.sun.tools.jconsole.JConsoleContext;
                 for (VariableNode var : variableDeclarations) {
                     if (var.getName().equals(varNames.get(0))) {
                         System.out.println("SAW ASSIGN - - - - -- - - - - - - - " + var.getName());
-                        var.setValue(leftvalue + rightvalue); // No need to cast here, as they're already int
+                        System.out.println("LEFT VALUE = " + leftvalue + " RIGHT VALUE " + rightvalue);
+                        if (binOperation.equals("PLUS"))
+                            var.setValue(leftvalue + rightvalue); // No need to cast here, as they're already int
+                        else if (binOperation.equals("MINUS"))
+                            var.setValue(leftvalue - rightvalue); // No need to cast here, as they're already int
+                        else if (binOperation.equals("MULTIPLY"))
+                            var.setValue(leftvalue * rightvalue); // No need to cast here, as they're already int
+                        else if (binOperation.equals("DIVIDE"))
+                            var.setValue(leftvalue / rightvalue); // No need to cast here, as they're already int
+                        System.out.println("VARR " + var.getValue());
+
                     }
                 }
 
                 System.out.println("IDENTIFIER CHECK " + lexer.peek().getType() + " VAR NAME " + lexer.peek().getValue() );
+                for (String varName : varNames) {
+                    System.out.println("VAR NAME " + varName);
+                }
             }
             else if (Token.Type.DISPLAY == lexer.peek().getType()) {
                 System.out.println("VAR NAMES " + varNames.get(0));
@@ -281,7 +333,7 @@ import com.sun.tools.jconsole.JConsoleContext;
             else
                 lexer.consume(Token.Type.ASSIGN, "=");
 
-            if (!found) {
+            if (!found && newToken.getType() != Token.Type.INTEGER_LITERAL) {
                 throw new ParseException("LINE: " + currentLine + " Undeclared variable " + newToken.getValue(), currentLine);
             }
         }
